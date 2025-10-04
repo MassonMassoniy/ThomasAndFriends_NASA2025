@@ -5,6 +5,7 @@ A dynamic script to query NASA Power API for weather data and predict probabilit
 """
 
 import requests
+import math
 import json
 import datetime
 from typing import Dict, List, Any, Optional, Tuple
@@ -35,9 +36,26 @@ class NASAWeatherProbability:
     THRESHOLDS = {
         'very_hot_temp': 35.0,  # °C
         'very_cold_temp': -10.0,  # °C
-        'very_windy_speed': 10.0,  # m/s
-        'very_wet_precip': 10.0,  # mm/day
-        'very_uncomfortable_humidity': 80.0  # %
+        'very_windy_speed': 10.0,  # m/s (Strong wind)
+        'very_wet_precip': 10.0,  # mm/day (Heavy rain)
+        'very_uncomfortable_humidity': 80.0  # % (Muggy)
+    }
+    
+    # Additional thresholds for weather conditions
+    WEATHER_THRESHOLDS = {
+        'heavy_rain': 10.0,      # mm/day
+        'moderate_rain': 1.0,    # mm/day
+        'strong_wind': 10.0,     # m/s
+        'breezy_wind': 5.0,      # m/s
+        'muggy_humidity': 80.0,  # %
+        'dry_humidity': 30.0,    # %
+        'hot_feeling': 25.0,     # °C - threshold for "Hot" vs "Cold" feeling
+        'warm_feeling': 15.0,     # °C - threshold for "Warm" vs "Cold" feeling
+        'cold_feeling': 0.0,     # °C - threshold for "Cold" vs "Very Cold" feeling
+        'excellent_air': 9,      # air quality index
+        'good_air': 8,           # air quality index
+        'fair_air': 7,           # air quality index
+        'moderate_air': 5        # air quality index
     }
     
     def __init__(self, longitude: float, latitude: float, start_year: Optional[int] = None, end_year: Optional[int] = None):
@@ -299,6 +317,7 @@ class NASAWeatherProbability:
             mean_val = sum(values) / len(values)
             std_val = (sum((x - mean_val) ** 2 for x in values) / len(values)) ** 0.5
             
+
             predicted_values[param] = round(mean_val, 2)
             
             # Calculate uncertainty for predicted values
@@ -332,7 +351,7 @@ class NASAWeatherProbability:
                 # Humidity probability
                 uncomfortable_count = sum(1 for v in values if v > self.THRESHOLDS['very_uncomfortable_humidity'])
                 probabilities['very_uncomfortable'] = round((uncomfortable_count / len(values)) * 100, 1)
-        
+        predicted_values['T2M_trend'] = self.calculate_predicted_T2M(seasonal_data)
         results['probabilities'] = probabilities
         results['predicted_values'] = predicted_values
         results['confidence'] = confidence
@@ -341,29 +360,146 @@ class NASAWeatherProbability:
         # Add derived predictions
         if 'T2M' in predicted_values:
             temp = predicted_values['T2M']
-            results['predicted_values']['feeling'] = "Hot" if temp > 25 else "Cold"
+            results['predicted_values']['feeling'] = (
+                "Hot" if temp > self.WEATHER_THRESHOLDS['hot_feeling']
+                else "Warm" if temp > self.WEATHER_THRESHOLDS['warm_feeling']
+                else "Cold"
+            )
         
         if 'PRECTOTCORR' in predicted_values:
             precip = predicted_values['PRECTOTCORR']
-            results['predicted_values']['precipitation'] = precip > 1.0
+            results['predicted_values']['precipitation'] = precip > self.WEATHER_THRESHOLDS['moderate_rain']
         
-        # Air quality estimation (simplified based on humidity and precipitation)
+        # Air quality estimation based on humidity and precipitation
         air_quality = 5  # Default moderate
         if 'RH2M' in predicted_values and 'PRECTOTCORR' in predicted_values:
             humidity = predicted_values['RH2M']
             precip = predicted_values['PRECTOTCORR']
             
-            if humidity > 80 and precip > 5:
+            # Air quality calculation following the JavaScript logic
+            if humidity >= 80 and precip >= 10:  # Muggy + Heavy rain = Poor
                 air_quality = 3  # Poor
-            elif humidity < 40 and precip < 1:
+            elif humidity <= 30 and precip < 1:  # Dry + Minimal rain = Excellent
+                air_quality = 9  # Excellent
+            elif humidity < 60 and precip < 2:   # Comfortable + Light rain = Good
                 air_quality = 8  # Good
-            elif humidity < 60 and precip < 2:
+            elif humidity < 70 and precip < 5:   # Comfortable + Moderate rain = Fair
                 air_quality = 7  # Fair
+            else:
+                air_quality = 5  # Moderate (default)
         
         results['predicted_values']['air_quality'] = air_quality
         
+        # Add weather condition labels following JavaScript logic
+        weather_conditions = {}
+        
+        # Precipitation condition
+        if 'PRECTOTCORR' in predicted_values:
+            precip = predicted_values['PRECTOTCORR']
+            if precip >= self.WEATHER_THRESHOLDS['heavy_rain']:
+                weather_conditions['precipitation_condition'] = "Heavy rain risk"
+            elif precip >= self.WEATHER_THRESHOLDS['moderate_rain']:
+                weather_conditions['precipitation_condition'] = "Light to moderate"
+            else:
+                weather_conditions['precipitation_condition'] = "Minimal"
+        
+        # Wind condition
+        if 'WS2M' in predicted_values:
+            wind_speed = predicted_values['WS2M']
+            if wind_speed >= self.WEATHER_THRESHOLDS['strong_wind']:
+                weather_conditions['wind_condition'] = "Strong"
+            elif wind_speed >= self.WEATHER_THRESHOLDS['breezy_wind']:
+                weather_conditions['wind_condition'] = "Breezy"
+            else:
+                weather_conditions['wind_condition'] = "Calm"
+        
+        # Humidity condition
+        if 'RH2M' in predicted_values:
+            humidity = predicted_values['RH2M']
+            if humidity >= self.WEATHER_THRESHOLDS['muggy_humidity']:
+                weather_conditions['humidity_condition'] = "Muggy"
+            elif humidity <= self.WEATHER_THRESHOLDS['dry_humidity']:
+                weather_conditions['humidity_condition'] = "Dry"
+            else:
+                weather_conditions['humidity_condition'] = "Comfortable"
+        
+        # Air quality label
+        if air_quality >= self.WEATHER_THRESHOLDS['excellent_air']:
+            weather_conditions['air_quality_label'] = "Excellent"
+        elif air_quality >= self.WEATHER_THRESHOLDS['good_air']:
+            weather_conditions['air_quality_label'] = "Good"
+        elif air_quality >= self.WEATHER_THRESHOLDS['fair_air']:
+            weather_conditions['air_quality_label'] = "Fair"
+        elif air_quality >= self.WEATHER_THRESHOLDS['moderate_air']:
+            weather_conditions['air_quality_label'] = "Moderate"
+        else:
+            weather_conditions['air_quality_label'] = "Poor"
+        
+        # Add weather conditions to results
+        results['weather_conditions'] = weather_conditions
+        
         return results
     
+    def calculate_predicted_T2M(self, seasonal_data: Dict[str, List[float]]) -> Optional[float]:
+        """Calculate predicted T2M value from seasonal data using a weighted recent mean + annual rate.
+        Select only the central day from each year's tolerance window (the 8th value of ~15) by sampling
+        one value per year before computing trend and weighted mean.
+        """
+        if 'T2M' not in seasonal_data or not seasonal_data['T2M']:
+            return None
+
+        all_values = seasonal_data['T2M']  # list containing ~15 values per year (ordered chronologically)
+        total_vals = len(all_values)
+        # expected number of years in the series
+        expected_years = max(1, (self.end_year - self.start_year + 1))
+
+        # approximate block size (number of samples per year). fallback to 1 to avoid zero division.
+        block_size = max(1, total_vals // expected_years)
+
+        # central index in each block (0-based). For block_size=15 this gives 7 (the 8th value).
+        center_idx = block_size // 2
+
+        # collect one sample per year: the central value of each block
+        year_samples: List[Tuple[int, float]] = []
+        for i in range(expected_years):
+            idx = i * block_size + center_idx
+            if idx < total_vals:
+                year = self.start_year + i
+                year_samples.append((year, float(all_values[idx])))
+
+        # If we couldn't form year_samples by blocks (e.g., uneven data), as a fallback try every 8th element
+        if not year_samples:
+            sampled = all_values[7::8] if total_vals > 7 else all_values[::max(1, total_vals)]
+            year_samples = [
+                (self.start_year + i, float(v)) for i, v in enumerate(sampled)
+            ]
+
+        # compute slope (°C/year) and weighted recent mean using the selected per-year samples
+        years = [y for (y, _v) in year_samples]
+        vals = [v for (_y, v) in year_samples]
+
+        if not years or not vals:
+            return None
+
+        n = len(years)
+        if n < 2:
+            slope = 0.0
+        else:
+            avg_year = sum(years) / n
+            avg_val = sum(vals) / n
+            num = sum((years[i] - avg_year) * (vals[i] - avg_val) for i in range(n))
+            den = sum((years[i] - avg_year) ** 2 for i in range(n))
+            slope = (num / den) if den != 0 else 0.0
+
+        # weighted recent mean: give more weight to recent years (decay controls emphasis)
+        decay = 0.25
+        max_year = max(years)
+        weights = [math.exp(decay * (y - max_year)) for y in years]
+        weighted_mean = sum(w * v for w, v in zip(weights, vals)) / sum(weights)
+
+        predicted = round(weighted_mean + slope, 2)
+        return predicted
+
     def predict_weather_for_date(self, target_date: str, parameters: Optional[List[str]] = None, tolerance_days: int = 7) -> Dict[str, Any]:
         """
         Main method to predict weather for a specific date
