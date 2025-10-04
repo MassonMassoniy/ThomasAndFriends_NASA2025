@@ -13,5 +13,15 @@
         </div>
     </div>
     <button type="submit"><strong>Will it rain on my parade?</strong></button>
+
+    <!-- Script to save the date in a variable -->
+    <script>
+        const dateInput = document.querySelector('input[type="date"]');
+        let selectedDate = null;
+        dateInput.addEventListener('change', function() {
+            selectedDate = this.value;
+            console.log("Selected date:", selectedDate);
+        });
+    </script>
 </body>
 </html>
