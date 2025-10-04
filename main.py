@@ -1,12 +1,27 @@
-from flask import Flask, url_for, redirect, render_template, flash
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+# ------ Pages ------
+@app.route('/')
 def index():
     # return render_template('index.html')
     return 'test'
 
-app.add_url_rule('/', 'home', index)
+
+# ------ APIs ------
+@app.route('/api/getWeather', methods=['GET'])
+def getWeather():
+    latitude = request.args.get('latitude', type=float)
+    longitude = request.args.get('longitude', type=float)
+
+    result = jsonify(
+        latitude=latitude,
+        longitude=longitude
+    )
+
+    return result
+
 
 if __name__ == '__main__':
     app.run(debug = True)
