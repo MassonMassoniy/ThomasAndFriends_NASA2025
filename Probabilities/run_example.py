@@ -13,15 +13,13 @@ def run_command_example():
     longitude = -97.1384
     latitude = 30.2672
     
-    # Example command for predicting weather on July 15th (using all parameters by default)
+    # Example command for predicting weather on July 15th (using dynamic year range and all parameters)
     cmd = [
         sys.executable, 
         "nasa_weather_probability.py",
         "--longitude", str(longitude),
         "--latitude", str(latitude),
         "--date", "07/15",  # July 15th
-        "--start-year", "2010",
-        "--end-year", "2024",
         "--tolerance-days", "7",
         "--output", "austin_july_15_prediction.json"
     ]
@@ -49,15 +47,13 @@ def run_winter_example():
     longitude = -74.0060
     latitude = 40.7128
     
-    # Example command for predicting weather on January 15th (using all parameters by default)
+    # Example command for predicting weather on January 15th (using dynamic year range and all parameters)
     cmd = [
         sys.executable, 
         "nasa_weather_probability.py",
         "--longitude", str(longitude),
         "--latitude", str(latitude),
         "--date", "01/15",  # January 15th
-        "--start-year", "2015",
-        "--end-year", "2024",
         "--tolerance-days", "5",
         "--output", "nyc_january_15_prediction.json"
     ]
@@ -85,15 +81,13 @@ def run_specific_year_example():
     longitude = -0.1276
     latitude = 51.5074
     
-    # Example command for predicting weather on June 21st, 2025 (using all parameters by default)
+    # Example command for predicting weather on June 21st, 2025 (using dynamic year range and all parameters)
     cmd = [
         sys.executable, 
         "nasa_weather_probability.py",
         "--longitude", str(longitude),
         "--latitude", str(latitude),
         "--date", "2025/06/21",  # June 21st, 2025
-        "--start-year", "2018",
-        "--end-year", "2024",
         "--tolerance-days", "10",
         "--output", "london_june_21_2025_prediction.json"
     ]

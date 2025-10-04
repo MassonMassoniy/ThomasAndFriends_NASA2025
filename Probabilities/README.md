@@ -1,8 +1,9 @@
 # Probabilities - Weather Probability Estimator
 
 ## Input:
-- The locationformat: {longitude:int value, latitude:int value}
-- The date format: String year/month/day/hour
+- **Location**: {longitude: float value, latitude: float value}
+- **Date format**: String "YYYY/MM/DD", "MM/DD", or "YYYYMMDD"
+- **Year range**: Dynamic by default (current year - 11 to current year - 1), or custom range via command line
 
 ## Parameters that we consider:
 - **T2M** - Air Temperature at 2 meters (°C)
@@ -81,8 +82,31 @@ The script returns a comprehensive JSON object with the following structure:
 ```
 
 ### Key Features:
+- **Dynamic Year Range**: Automatically uses the last 10 years of data (current year - 11 to current year - 1)
+- **All Parameters**: Uses all 9 available weather parameters by default
 - **Probabilities**: Historical percentage chances of extreme weather conditions
 - **Predicted Values**: Mean values based on historical data for the same seasonal period
 - **Confidence Levels**: Indicates reliability based on sample size
 - **Metadata**: Complete information about the analysis parameters and data sources
 - **Zero Null Values**: NASA Power API provides 100% data completeness (no missing values)
+
+### Usage Examples:
+
+**Basic usage (uses dynamic year range and all parameters):**
+```bash
+python nasa_weather_probability.py --longitude -97.1384 --latitude 30.2672 --date "07/15"
+```
+
+**Custom year range:**
+```bash
+python nasa_weather_probability.py --longitude -97.1384 --latitude 30.2672 --date "07/15" --start-year 2020 --end-year 2023
+```
+
+**Python script usage:**
+```python
+from nasa_weather_probability import NASAWeatherProbability
+
+# Uses dynamic year range (2014-2024 in 2025)
+estimator = NASAWeatherProbability(longitude=-97.1384, latitude=30.2672)
+results = estimator.predict_weather_for_date("07/15")
+```
