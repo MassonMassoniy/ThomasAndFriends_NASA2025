@@ -45,14 +45,17 @@ class NASAWeatherProbability:
         Args:
             longitude: Longitude coordinate
             latitude: Latitude coordinate
-            start_year: Start year for data collection
-            end_year: End year for data collection
+            start_year: Start year for data collection (default: 2010)
+            end_year: End year for data collection (default: 2024)
         """
         self.longitude = longitude
         self.latitude = latitude
         self.start_year = start_year
         self.end_year = end_year
         self.base_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
+        
+        # Use all available parameters by default
+        self.default_parameters = list(self.AVAILABLE_PARAMETERS.keys())
         
     def build_api_url(self, parameters: List[str], start_date: str, end_date: str) -> str:
         """
@@ -308,18 +311,23 @@ class NASAWeatherProbability:
         
         return results
     
-    def predict_weather_for_date(self, target_date: str, parameters: List[str], tolerance_days: int = 7) -> Dict[str, Any]:
+    def predict_weather_for_date(self, target_date: str, parameters: Optional[List[str]] = None, tolerance_days: int = 7) -> Dict[str, Any]:
         """
         Main method to predict weather for a specific date
         
         Args:
             target_date: Target date in format "YYYY/MM/DD", "MM/DD", or "YYYYMMDD"
-            parameters: List of parameter codes to request
+            parameters: List of parameter codes to request (if None, uses all available parameters)
             tolerance_days: Number of days before/after target date to include in analysis
             
         Returns:
             Complete weather prediction for the target date
         """
+        # Use all parameters by default if none specified
+        if parameters is None:
+            parameters = self.default_parameters
+            print(f"Using all available parameters: {', '.join(parameters)}")
+        
         # Validate parameters
         invalid_params = [p for p in parameters if p not in self.AVAILABLE_PARAMETERS]
         if invalid_params:
@@ -370,13 +378,13 @@ def main():
     parser.add_argument('--longitude', type=float, required=True, help='Longitude coordinate')
     parser.add_argument('--latitude', type=float, required=True, help='Latitude coordinate')
     parser.add_argument('--date', type=str, required=True, help='Target date (YYYY/MM/DD, MM/DD, or YYYYMMDD)')
-    parser.add_argument('--parameters', nargs='+', 
+    parser.add_argument('--parameters', nargs='*', 
                        choices=list(NASAWeatherProbability.AVAILABLE_PARAMETERS.keys()),
-                       default=['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'RH2M'],
-                       help='Parameters to request from NASA API')
-    parser.add_argument('--start-year', type=int, default=2010, help='Start year for data collection')
-    parser.add_argument('--end-year', type=int, default=2024, help='End year for data collection')
-    parser.add_argument('--tolerance-days', type=int, default=7, help='Days before/after target date to include')
+                       default=None,
+                       help='Parameters to request from NASA API (if not specified, uses all available parameters)')
+    parser.add_argument('--start-year', type=int, default=2010, help='Start year for data collection (default: 2010)')
+    parser.add_argument('--end-year', type=int, default=2024, help='End year for data collection (default: 2024)')
+    parser.add_argument('--tolerance-days', type=int, default=7, help='Days before/after target date to include (default: 7)')
     parser.add_argument('--output', type=str, help='Output file path (optional)')
     
     args = parser.parse_args()
@@ -389,8 +397,11 @@ def main():
         end_year=args.end_year
     )
     
+    # Use all parameters if none specified
+    parameters = args.parameters if args.parameters else None
+    
     # Predict weather for target date
-    results = estimator.predict_weather_for_date(args.date, args.parameters, args.tolerance_days)
+    results = estimator.predict_weather_for_date(args.date, parameters, args.tolerance_days)
     
     if not results:
         print("Failed to predict weather for the specified date")

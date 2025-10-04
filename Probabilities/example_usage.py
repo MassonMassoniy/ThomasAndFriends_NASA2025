@@ -18,11 +18,10 @@ def example_summer_date():
         end_year=2024
     )
     
-    # Predict weather for July 15th (summer)
+    # Predict weather for July 15th (summer) - using all parameters by default
     target_date = "07/15"  # July 15th
-    parameters = ['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'RH2M']
     
-    results = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=7)
+    results = estimator.predict_weather_for_date(target_date, tolerance_days=7)
     
     print(f"Weather Prediction for {target_date}:")
     print(json.dumps(results, indent=2))
@@ -39,11 +38,10 @@ def example_winter_date():
         end_year=2024
     )
     
-    # Predict weather for January 15th (winter)
+    # Predict weather for January 15th (winter) - using all parameters by default
     target_date = "01/15"  # January 15th
-    parameters = ['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'RH2M']
     
-    results = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=5)
+    results = estimator.predict_weather_for_date(target_date, tolerance_days=5)
     
     print(f"Weather Prediction for {target_date}:")
     print(json.dumps(results, indent=2))
@@ -60,11 +58,10 @@ def example_specific_year_date():
         end_year=2024
     )
     
-    # Predict weather for June 21st, 2025 (summer solstice)
+    # Predict weather for June 21st, 2025 (summer solstice) - using all parameters by default
     target_date = "2025/06/21"  # June 21st, 2025
-    parameters = ['T2M', 'T2M_MAX', 'PRECTOTCORR', 'WS2M', 'RH2M']
     
-    results = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=10)
+    results = estimator.predict_weather_for_date(target_date, tolerance_days=10)
     
     print(f"Weather Prediction for {target_date}:")
     print(json.dumps(results, indent=2))
@@ -81,11 +78,10 @@ def example_spring_date():
         end_year=2024
     )
     
-    # Predict weather for April 15th (spring)
+    # Predict weather for April 15th (spring) - using all parameters by default
     target_date = "04/15"  # April 15th
-    parameters = ['T2M', 'T2M_MAX', 'PRECTOTCORR', 'WS2M', 'RH2M']
     
-    results = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=7)
+    results = estimator.predict_weather_for_date(target_date, tolerance_days=7)
     
     print(f"Weather Prediction for {target_date}:")
     print(json.dumps(results, indent=2))
@@ -102,11 +98,10 @@ def example_save_to_file():
         end_year=2024
     )
     
-    # Predict weather for August 15th (peak summer)
+    # Predict weather for August 15th (peak summer) - using all parameters by default
     target_date = "08/15"  # August 15th
-    parameters = ['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'RH2M']
     
-    results = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=7)
+    results = estimator.predict_weather_for_date(target_date, tolerance_days=7)
     
     # Save to file
     output_file = "miami_august_weather_prediction.json"
@@ -127,15 +122,13 @@ def example_compare_dates():
         end_year=2024
     )
     
-    parameters = ['T2M', 'T2M_MAX', 'PRECTOTCORR', 'WS2M']
-    
-    # Compare different dates
+    # Compare different dates - using all parameters by default
     dates_to_compare = ["01/15", "04/15", "07/15", "10/15"]
     
     comparison_results = {}
     
     for date in dates_to_compare:
-        results = estimator.predict_weather_for_date(date, parameters, tolerance_days=7)
+        results = estimator.predict_weather_for_date(date, tolerance_days=7)
         comparison_results[date] = {
             'probabilities': results.get('probabilities', {}),
             'predicted_values': results.get('predicted_values', {}),

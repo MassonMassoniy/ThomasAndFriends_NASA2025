@@ -9,9 +9,13 @@
   "predicted_values": {
     "T2M": 29.84,
     "T2M_MAX": 36.15,
+    "T2M_MIN": 24.24,
     "PRECTOTCORR": 1.95,
     "WS2M": 2.58,
     "RH2M": 65.03,
+    "T2MWET": 25.54,
+    "IMERG_PRECLIQUID_PROB": -999.0,
+    "CLRSKY_SFC_SW_DWN": 7.82,
     "feeling": "Hot",
     "precipitation": true,
     "air_quality": 5
@@ -19,9 +23,13 @@
   "confidence": {
     "T2M": "high",
     "T2M_MAX": "high",
+    "T2M_MIN": "high",
     "PRECTOTCORR": "high",
     "WS2M": "high",
-    "RH2M": "high"
+    "RH2M": "high",
+    "T2MWET": "high",
+    "IMERG_PRECLIQUID_PROB": "high",
+    "CLRSKY_SFC_SW_DWN": "high"
   },
   "metadata": {
     "location": {
@@ -31,16 +39,24 @@
     "data_points_used": {
       "T2M": 225,
       "T2M_MAX": 225,
+      "T2M_MIN": 225,
       "PRECTOTCORR": 225,
       "WS2M": 225,
-      "RH2M": 225
+      "RH2M": 225,
+      "T2MWET": 225,
+      "IMERG_PRECLIQUID_PROB": 225,
+      "CLRSKY_SFC_SW_DWN": 225
     },
     "parameters_requested": [
       "T2M",
       "T2M_MAX",
+      "T2M_MIN",
       "PRECTOTCORR",
       "WS2M",
-      "RH2M"
+      "RH2M",
+      "T2MWET",
+      "IMERG_PRECLIQUID_PROB",
+      "CLRSKY_SFC_SW_DWN"
     ],
     "target_date": "07/15",
     "target_month": 7,
