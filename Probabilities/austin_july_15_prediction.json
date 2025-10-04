@@ -1,0 +1,50 @@
+{
+  "probabilities": {
+    "very_hot": 64.9,
+    "very_cold": 0.0,
+    "very_wet": 6.2,
+    "very_windy": 0.0,
+    "very_uncomfortable": 11.6
+  },
+  "predicted_values": {
+    "T2M": 29.84,
+    "T2M_MAX": 36.15,
+    "PRECTOTCORR": 1.95,
+    "WS2M": 2.58,
+    "RH2M": 65.03,
+    "feeling": "Hot",
+    "precipitation": true,
+    "air_quality": 5
+  },
+  "confidence": {
+    "T2M": "high",
+    "T2M_MAX": "high",
+    "PRECTOTCORR": "high",
+    "WS2M": "high",
+    "RH2M": "high"
+  },
+  "metadata": {
+    "location": {
+      "longitude": -97.1384,
+      "latitude": 30.2672
+    },
+    "data_points_used": {
+      "T2M": 225,
+      "T2M_MAX": 225,
+      "PRECTOTCORR": 225,
+      "WS2M": 225,
+      "RH2M": 225
+    },
+    "parameters_requested": [
+      "T2M",
+      "T2M_MAX",
+      "PRECTOTCORR",
+      "WS2M",
+      "RH2M"
+    ],
+    "target_date": "07/15",
+    "target_month": 7,
+    "target_day": 15,
+    "tolerance_days": 7
+  }
+}
