@@ -35,9 +35,26 @@ class NASAWeatherProbability:
     THRESHOLDS = {
         'very_hot_temp': 35.0,  # °C
         'very_cold_temp': -10.0,  # °C
-        'very_windy_speed': 10.0,  # m/s
-        'very_wet_precip': 10.0,  # mm/day
-        'very_uncomfortable_humidity': 80.0  # %
+        'very_windy_speed': 10.0,  # m/s (Strong wind)
+        'very_wet_precip': 10.0,  # mm/day (Heavy rain)
+        'very_uncomfortable_humidity': 80.0  # % (Muggy)
+    }
+    
+    # Additional thresholds for weather conditions
+    WEATHER_THRESHOLDS = {
+        'heavy_rain': 10.0,      # mm/day
+        'moderate_rain': 1.0,    # mm/day
+        'strong_wind': 10.0,     # m/s
+        'breezy_wind': 5.0,      # m/s
+        'muggy_humidity': 80.0,  # %
+        'dry_humidity': 30.0,    # %
+        'hot_feeling': 25.0,     # °C - threshold for "Hot" vs "Cold" feeling
+        'warm_feeling': 15.0,     # °C - threshold for "Warm" vs "Cold" feeling
+        'cold_feeling': 0.0,     # °C - threshold for "Cold" vs "Very Cold" feeling
+        'excellent_air': 9,      # air quality index
+        'good_air': 8,           # air quality index
+        'fair_air': 7,           # air quality index
+        'moderate_air': 5        # air quality index
     }
     
     def __init__(self, longitude: float, latitude: float, start_year: Optional[int] = None, end_year: Optional[int] = None):
@@ -341,26 +358,83 @@ class NASAWeatherProbability:
         # Add derived predictions
         if 'T2M' in predicted_values:
             temp = predicted_values['T2M']
-            results['predicted_values']['feeling'] = "Hot" if temp > 25 else "Cold"
+            results['predicted_values']['feeling'] = (
+                "Hot" if temp > self.WEATHER_THRESHOLDS['hot_feeling']
+                else "Warm" if temp > self.WEATHER_THRESHOLDS['warm_feeling']
+                else "Cold"
+            )
         
         if 'PRECTOTCORR' in predicted_values:
             precip = predicted_values['PRECTOTCORR']
-            results['predicted_values']['precipitation'] = precip > 1.0
+            results['predicted_values']['precipitation'] = precip > self.WEATHER_THRESHOLDS['moderate_rain']
         
-        # Air quality estimation (simplified based on humidity and precipitation)
+        # Air quality estimation based on humidity and precipitation
         air_quality = 5  # Default moderate
         if 'RH2M' in predicted_values and 'PRECTOTCORR' in predicted_values:
             humidity = predicted_values['RH2M']
             precip = predicted_values['PRECTOTCORR']
             
-            if humidity > 80 and precip > 5:
+            # Air quality calculation following the JavaScript logic
+            if humidity >= 80 and precip >= 10:  # Muggy + Heavy rain = Poor
                 air_quality = 3  # Poor
-            elif humidity < 40 and precip < 1:
+            elif humidity <= 30 and precip < 1:  # Dry + Minimal rain = Excellent
+                air_quality = 9  # Excellent
+            elif humidity < 60 and precip < 2:   # Comfortable + Light rain = Good
                 air_quality = 8  # Good
-            elif humidity < 60 and precip < 2:
+            elif humidity < 70 and precip < 5:   # Comfortable + Moderate rain = Fair
                 air_quality = 7  # Fair
+            else:
+                air_quality = 5  # Moderate (default)
         
         results['predicted_values']['air_quality'] = air_quality
+        
+        # Add weather condition labels following JavaScript logic
+        weather_conditions = {}
+        
+        # Precipitation condition
+        if 'PRECTOTCORR' in predicted_values:
+            precip = predicted_values['PRECTOTCORR']
+            if precip >= self.WEATHER_THRESHOLDS['heavy_rain']:
+                weather_conditions['precipitation_condition'] = "Heavy rain risk"
+            elif precip >= self.WEATHER_THRESHOLDS['moderate_rain']:
+                weather_conditions['precipitation_condition'] = "Light to moderate"
+            else:
+                weather_conditions['precipitation_condition'] = "Minimal"
+        
+        # Wind condition
+        if 'WS2M' in predicted_values:
+            wind_speed = predicted_values['WS2M']
+            if wind_speed >= self.WEATHER_THRESHOLDS['strong_wind']:
+                weather_conditions['wind_condition'] = "Strong"
+            elif wind_speed >= self.WEATHER_THRESHOLDS['breezy_wind']:
+                weather_conditions['wind_condition'] = "Breezy"
+            else:
+                weather_conditions['wind_condition'] = "Calm"
+        
+        # Humidity condition
+        if 'RH2M' in predicted_values:
+            humidity = predicted_values['RH2M']
+            if humidity >= self.WEATHER_THRESHOLDS['muggy_humidity']:
+                weather_conditions['humidity_condition'] = "Muggy"
+            elif humidity <= self.WEATHER_THRESHOLDS['dry_humidity']:
+                weather_conditions['humidity_condition'] = "Dry"
+            else:
+                weather_conditions['humidity_condition'] = "Comfortable"
+        
+        # Air quality label
+        if air_quality >= self.WEATHER_THRESHOLDS['excellent_air']:
+            weather_conditions['air_quality_label'] = "Excellent"
+        elif air_quality >= self.WEATHER_THRESHOLDS['good_air']:
+            weather_conditions['air_quality_label'] = "Good"
+        elif air_quality >= self.WEATHER_THRESHOLDS['fair_air']:
+            weather_conditions['air_quality_label'] = "Fair"
+        elif air_quality >= self.WEATHER_THRESHOLDS['moderate_air']:
+            weather_conditions['air_quality_label'] = "Moderate"
+        else:
+            weather_conditions['air_quality_label'] = "Poor"
+        
+        # Add weather conditions to results
+        results['weather_conditions'] = weather_conditions
         
         return results
     
