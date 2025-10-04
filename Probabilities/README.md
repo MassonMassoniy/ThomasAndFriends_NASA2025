@@ -45,7 +45,7 @@ The script returns a comprehensive JSON object with the following structure:
     "WS2M": 3.2,                // Predicted wind speed at 2m (m/s)
     "WD2M": 169.5,              // Predicted wind direction at 2m (degrees)
     "RH2M": 65.0,               // Predicted relative humidity (%)
-    "T2M_trend": 30.76,          // Predicted value which is calculated with advanced algorithm
+    "T2M_trend": 30.76,          // Predicted value which is calculated with advanced algorithm (climate change)
     "feeling": "Hot",            // Derived feeling: "Hot" (>25°C) or "Cold" (≤25°C)
     "precipitation": true,       // Boolean: true if precipitation > 1.0mm/day
     "air_quality": 7            // Air quality index (0-10): 3=Poor, 5=Moderate, 7=Fair, 8=Good
