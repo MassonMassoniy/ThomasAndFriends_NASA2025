@@ -1,10 +1,10 @@
 "use client";
-
 import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
-import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import { getWeatherData } from '@/lib/getData';
+import { WeatherDataProvider } from '@/context/WeatherDataContext';
 
 export default function AdminLayout({
   children,
@@ -12,11 +12,11 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  // const data = await getWeatherData(96, 59, '20240629'); // fetch the data with specified coordinates
+  //<WeatherDataProvider initial={data}> </WeatherDataProvider>
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = "ml-0";
-
-
   return (
     <div className="min-h-screen xl:flex">
       {/* Sidebar and Backdrop */}
@@ -28,7 +28,9 @@ export default function AdminLayout({
         {/* Header */}
         <AppHeader />
         {/* Page Content */}
-        <div className="p-4 mx-auto md:p-6">{children}</div>
+        
+          <div className="p-4 mx-auto md:p-6">{children}</div>
+        
       </div>
     </div>
   );

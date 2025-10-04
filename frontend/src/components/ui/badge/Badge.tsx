@@ -29,7 +29,7 @@ const Badge: React.FC<BadgeProps> = ({
   children,
 }) => {
   const baseStyles =
-    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
+    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium ";
 
   // Define size styles
   const sizeStyles = {
@@ -70,7 +70,9 @@ const Badge: React.FC<BadgeProps> = ({
   return (
     <span className={`${baseStyles} ${sizeClass} ${colorStyles}`}>
       {startIcon && <span className="mr-1">{startIcon}</span>}
+      <span className="min-w-0 flex-1 truncate text-center whitespace-nowrap text-[clamp(10px,0.9vw+0.35rem,0.875rem)]">
       {children}
+      </span>
       {endIcon && <span className="ml-1">{endIcon}</span>}
     </span>
   );
