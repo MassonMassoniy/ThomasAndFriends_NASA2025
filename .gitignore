@@ -245,3 +245,12 @@ frontend/.vercel
 # typescript
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+
+
+frontend/public/images/cards
+frontend/public/images/carousel
+frontend/public/images/chat
+frontend/public/images/grid-image
+frontend/public/images/product
+frontend/public/images/user
+frontend/public/images/video-thumb
