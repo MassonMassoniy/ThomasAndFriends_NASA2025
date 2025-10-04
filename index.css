@@ -1,0 +1,48 @@
+body {
+    background-color: #f9fafb;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Top text */
+.heading {
+    margin-top: 5%;
+    text-align: center;
+    font-size: 300%;
+    color: #000000;
+}
+
+/* Input space */
+.input {
+    text-align: center;
+    margin-top: 5%;
+}
+
+/* Input field */
+input[type="text"] {
+    padding: 1%;
+    border-radius: 10px;
+    font-size: 120%;
+    width: 30%;
+    margin-top: 12%;
+    background-color: rgb(255, 255, 255);
+}
+
+/* Button parameters */
+button {
+    display: inline-block;
+    width: 28%;
+    height: 7%;
+    padding: 14px 28px;
+    font-size: 24px;
+    border-radius: 10px;
+    background-color: #6283ff;
+    color: #000000;
+    border: none;
+    cursor: pointer;
+    margin-top: 20%;
+    margin-left: 36%;
+}
+
+button:hover {
+    background-color: #496ceb;
+}
