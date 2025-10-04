@@ -11,6 +11,37 @@ body {
     color: #000000;
 }
 
+.input-container {
+    display: flex;
+    justify-content: center;
+    gap: 5%;
+    margin-top: 5%;
+}
+
+.input-row input[type="text"] {
+    padding: 1%;
+    border-radius: 10px;
+    font-size: 100%;
+    width: 300%;
+    height: 40%;
+    margin-left: -164%;
+    margin-top: 70%;
+    background-color: #dcdcdc;
+    border: 1px solid #707070;
+}
+
+.input-date input[type="date"] {
+    padding: 1%;
+    border-radius: 10px;
+    font-size: 150%;
+    width: 100%;
+    height: 20%;
+    margin-left: 350%;
+    margin-top: 100%;
+    background-color: #dcdcdc;
+    border: 1px solid #707070;
+}
+
 /* Input space */
 .input {
     text-align: center;
