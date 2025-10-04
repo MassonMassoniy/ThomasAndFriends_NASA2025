@@ -10,8 +10,26 @@
         <div class="input">
             <input type="text" id="address" name="address" placeholder="Enter the full address">
             <input type="date" name="date">
+            <div class="map" id="map"></div>
         </div>
     </div>
     <button type="submit"><strong>Will it rain on my parade?</strong></button>
 </body>
+<script type="importmap">
+    {
+        "imports": {
+            "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js"
+        }
+    }
+</script>
+<script type="module">
+    import L, {Map, TileLayer, Marker, Circle, Polygon, Popup} from 'leaflet';
+
+    const map = new Map('map').setView([51.505, -0.09], 13);
+
+    const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+</script>
 </html>
