@@ -38,20 +38,24 @@ class NASAWeatherProbability:
         'very_uncomfortable_humidity': 80.0  # %
     }
     
-    def __init__(self, longitude: float, latitude: float, start_year: int = 2010, end_year: int = 2024):
+    def __init__(self, longitude: float, latitude: float, start_year: Optional[int] = None, end_year: Optional[int] = None):
         """
         Initialize the NASA Weather Probability estimator
         
         Args:
             longitude: Longitude coordinate
             latitude: Latitude coordinate
-            start_year: Start year for data collection (default: 2010)
-            end_year: End year for data collection (default: 2024)
+            start_year: Start year for data collection (if None, uses current_year - 11)
+            end_year: End year for data collection (if None, uses current_year - 1)
         """
         self.longitude = longitude
         self.latitude = latitude
-        self.start_year = start_year
-        self.end_year = end_year
+        
+        # Set dynamic year range if not provided
+        current_year = datetime.datetime.now().year
+        self.start_year = start_year if start_year is not None else current_year - 11
+        self.end_year = end_year if end_year is not None else current_year - 1
+        
         self.base_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
         
         # Use all available parameters by default
@@ -382,8 +386,15 @@ def main():
                        choices=list(NASAWeatherProbability.AVAILABLE_PARAMETERS.keys()),
                        default=None,
                        help='Parameters to request from NASA API (if not specified, uses all available parameters)')
-    parser.add_argument('--start-year', type=int, default=2010, help='Start year for data collection (default: 2010)')
-    parser.add_argument('--end-year', type=int, default=2024, help='End year for data collection (default: 2024)')
+    # Calculate dynamic defaults
+    current_year = datetime.datetime.now().year
+    default_start_year = current_year - 11
+    default_end_year = current_year - 1
+    
+    parser.add_argument('--start-year', type=int, default=None, 
+                       help=f'Start year for data collection (default: {default_start_year} - current year - 11)')
+    parser.add_argument('--end-year', type=int, default=None, 
+                       help=f'End year for data collection (default: {default_end_year} - current year - 1)')
     parser.add_argument('--tolerance-days', type=int, default=7, help='Days before/after target date to include (default: 7)')
     parser.add_argument('--output', type=str, help='Output file path (optional)')
     
@@ -396,6 +407,9 @@ def main():
         start_year=args.start_year,
         end_year=args.end_year
     )
+    
+    # Print the year range being used
+    print(f"Using year range: {estimator.start_year} to {estimator.end_year}")
     
     # Use all parameters if none specified
     parameters = args.parameters if args.parameters else None

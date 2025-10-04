@@ -10,12 +10,10 @@ def example_summer_date():
     """Example predicting weather for a summer date"""
     print("=== Summer Date Prediction Example ===")
     
-    # Create estimator for Austin, Texas coordinates
+    # Create estimator for Austin, Texas coordinates (using dynamic year range)
     estimator = NASAWeatherProbability(
         longitude=-97.1384,
-        latitude=30.2672,
-        start_year=2015,
-        end_year=2024
+        latitude=30.2672
     )
     
     # Predict weather for July 15th (summer) - using all parameters by default
@@ -30,12 +28,10 @@ def example_winter_date():
     """Example predicting weather for a winter date"""
     print("\n=== Winter Date Prediction Example ===")
     
-    # Create estimator for New York City coordinates
+    # Create estimator for New York City coordinates (using dynamic year range)
     estimator = NASAWeatherProbability(
         longitude=-74.0060,
-        latitude=40.7128,
-        start_year=2020,
-        end_year=2024
+        latitude=40.7128
     )
     
     # Predict weather for January 15th (winter) - using all parameters by default
@@ -50,12 +46,10 @@ def example_specific_year_date():
     """Example predicting weather for a specific date with year"""
     print("\n=== Specific Year Date Prediction Example ===")
     
-    # Create estimator for London coordinates
+    # Create estimator for London coordinates (using dynamic year range)
     estimator = NASAWeatherProbability(
         longitude=-0.1276,
-        latitude=51.5074,
-        start_year=2018,
-        end_year=2024
+        latitude=51.5074
     )
     
     # Predict weather for June 21st, 2025 (summer solstice) - using all parameters by default
@@ -70,12 +64,10 @@ def example_spring_date():
     """Example predicting weather for a spring date"""
     print("\n=== Spring Date Prediction Example ===")
     
-    # Create estimator for Tokyo coordinates
+    # Create estimator for Tokyo coordinates (using dynamic year range)
     estimator = NASAWeatherProbability(
         longitude=139.6917,
-        latitude=35.6895,
-        start_year=2010,
-        end_year=2024
+        latitude=35.6895
     )
     
     # Predict weather for April 15th (spring) - using all parameters by default
@@ -90,12 +82,10 @@ def example_save_to_file():
     """Example of saving results to a file"""
     print("\n=== Save to File Example ===")
     
-    # Create estimator for Miami coordinates
+    # Create estimator for Miami coordinates (using dynamic year range)
     estimator = NASAWeatherProbability(
         longitude=-80.1918,
-        latitude=25.7617,
-        start_year=2015,
-        end_year=2024
+        latitude=25.7617
     )
     
     # Predict weather for August 15th (peak summer) - using all parameters by default
@@ -114,12 +104,10 @@ def example_compare_dates():
     """Example comparing weather predictions for different dates"""
     print("\n=== Date Comparison Example ===")
     
-    # Create estimator for Denver coordinates
+    # Create estimator for Denver coordinates (using dynamic year range)
     estimator = NASAWeatherProbability(
         longitude=-104.9903,
-        latitude=39.7392,
-        start_year=2015,
-        end_year=2024
+        latitude=39.7392
     )
     
     # Compare different dates - using all parameters by default
