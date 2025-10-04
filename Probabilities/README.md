@@ -44,19 +44,11 @@ The script returns a comprehensive JSON object with the following structure:
     "PRECTOTCORR": 1.47,        // Predicted precipitation (mm/day)
     "WS2M": 2.6,                // Predicted wind speed at 2m (m/s)
     "WD2M": 169.5,              // Predicted wind direction at 2m (degrees)
-    "RH2M": 65.16,              // Predicted relative humidity (%)
-    "T2MWET": 25.59,            // Predicted wet-bulb temperature at 2m (°C)
-    "IMERG_PRECLIQUID_PROB": -999.0,  // Predicted liquid precipitation probability
-    "CLRSKY_SFC_SW_DWN": 7.84,  // Predicted clear-sky irradiance
-    "feeling": "Hot",            // Derived feeling: "Hot" (>25°C) or "Cold" (≤25°C) - uses WEATHER_THRESHOLDS['hot_feeling']
-    "precipitation": true,       // Boolean: true if precipitation > 1.0mm/day - uses WEATHER_THRESHOLDS['moderate_rain']
-    "air_quality": 7            // Air quality index (0-10): 3=Poor, 5=Moderate, 7=Fair, 8=Good, 9=Excellent
-  },
-  "weather_conditions": {
-    "precipitation_condition": "Light to moderate",  // "Heavy rain risk" (≥10mm), "Light to moderate" (≥1mm), "Minimal" (<1mm)
-    "wind_condition": "Calm",                       // "Strong" (≥10 m/s), "Breezy" (≥5 m/s), "Calm" (<5 m/s)
-    "humidity_condition": "Comfortable",            // "Muggy" (≥80%), "Dry" (≤30%), "Comfortable" (30-80%)
-    "air_quality_label": "Fair"                     // "Excellent" (≥9), "Good" (≥8), "Fair" (≥7), "Moderate" (≥5), "Poor" (<5)
+    "RH2M": 65.0,               // Predicted relative humidity (%)
+    "T2M_trend": 30.76,          // Predicted value which is calculated with advanced algorithm (climate change)
+    "feeling": "Hot",            // Derived feeling: "Hot" (>25°C) or "Cold" (≤25°C)
+    "precipitation": true,       // Boolean: true if precipitation > 1.0mm/day
+    "air_quality": 7            // Air quality index (0-10): 3=Poor, 5=Moderate, 7=Fair, 8=Good
   },
   "confidence": {
     "T2M": "high",              // Data confidence level: "low" (<5 points), "medium" (5-14), "high" (≥15)
