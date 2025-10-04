@@ -39,6 +39,7 @@ body {
 
 .button-container{
     display: flex;
+    margin-top: -5%;
 }
 
 /* date input */
