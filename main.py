@@ -1,12 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
 # ------ Pages ------
 @app.route('/')
 def index():
-    # return render_template('index.html')
-    return 'test'
+    return render_template('index.html')
 
 
 # ------ APIs ------
