@@ -17,6 +17,7 @@ body {
 }
 
 .input-container{
+    margin-top: 40%;
     display: flex;
     height: 10%;
     gap: 5%;
@@ -33,13 +34,13 @@ body {
 .map-container{
     position: fixed;
     height: 30%;
-    width: 50%;
-    margin-left: 25%;
+    width: 40%;
+    margin-left: 30%;
 }
 
 .button-container{
     display: flex;
-    margin-top: -5%;
+    margin-top: -10%;
 }
 
 /* date input */
