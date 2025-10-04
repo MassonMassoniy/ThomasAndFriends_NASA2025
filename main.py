@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from Probabilities.nasa_weather_probability import NASAWeatherProbability
 
 app = Flask(__name__)
 
@@ -13,11 +14,18 @@ def index():
 def getWeather():
     latitude = request.args.get('latitude', type=float)
     longitude = request.args.get('longitude', type=float)
+    target_date = request.args.get('date', type=str)
 
-    result = jsonify(
-        latitude=latitude,
-        longitude=longitude
+    estimator = NASAWeatherProbability(
+        longitude = longitude,
+        latitude = latitude,
+        start_year = 2015,
+        end_year = 2024,
     )
+
+    parameters = ['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'RH2M']
+
+    result = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=7)
 
     return result
 
