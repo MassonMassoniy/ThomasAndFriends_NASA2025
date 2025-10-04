@@ -11,6 +11,7 @@
 - **T2M_MIN** - Daily Minimum Temperature (°C)
 - **PRECTOTCORR** - Corrected Total Precipitation (mm/day)
 - **WS2M** - Wind Speed at 2 meters (m/s)
+- **WD2M** - Wind Direction at 2 meters (degrees)
 - **RH2M** - Relative Humidity at 2 meters (%)
 - **T2MWET** - Wet-bulb Temperature at 2 meters (°C)
 - **IMERG_PRECLIQUID_PROB** - Probability of Liquid Precipitation
@@ -42,6 +43,7 @@ The script returns a comprehensive JSON object with the following structure:
     "T2M_MIN": 25.12,           // Predicted daily minimum temperature (°C)
     "PRECTOTCORR": 1.83,        // Predicted precipitation (mm/day)
     "WS2M": 3.2,                // Predicted wind speed at 2m (m/s)
+    "WD2M": 169.5,              // Predicted wind direction at 2m (degrees)
     "RH2M": 65.0,               // Predicted relative humidity (%)
     "feeling": "Hot",            // Derived feeling: "Hot" (>25°C) or "Cold" (≤25°C)
     "precipitation": true,       // Boolean: true if precipitation > 1.0mm/day
@@ -52,7 +54,27 @@ The script returns a comprehensive JSON object with the following structure:
     "T2M_MAX": "high",
     "PRECTOTCORR": "high",
     "WS2M": "high",
+    "WD2M": "high",
     "RH2M": "high"
+  },
+  "uncertainty": {
+    "predicted_values": {
+      "T2M": {
+        "margin_of_error": 0.36,        // ±0.36°C at 95% confidence interval
+        "confidence_interval_width": 0.72,  // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "WS2M": {
+        "margin_of_error": 0.12,        // ±0.12 m/s at 95% confidence interval
+        "confidence_interval_width": 0.24,  // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "WD2M": {
+        "margin_of_error": 7.64,        // ±7.64° at 95% confidence interval
+        "confidence_interval_width": 15.28, // Total width of 95% CI
+        "confidence_level": "95%"
+      }
+    }
   },
   "metadata": {
     "location": {
@@ -83,9 +105,10 @@ The script returns a comprehensive JSON object with the following structure:
 
 ### Key Features:
 - **Dynamic Year Range**: Automatically uses the last 10 years of data (current year - 11 to current year - 1)
-- **All Parameters**: Uses all 9 available weather parameters by default
+- **All Parameters**: Uses all 10 available weather parameters by default (including wind direction)
 - **Probabilities**: Historical percentage chances of extreme weather conditions
 - **Predicted Values**: Mean values based on historical data for the same seasonal period
+- **Uncertainty Quantification**: 95% confidence intervals for all predicted values
 - **Confidence Levels**: Indicates reliability based on sample size
 - **Metadata**: Complete information about the analysis parameters and data sources
 - **Zero Null Values**: NASA Power API provides 100% data completeness (no missing values)

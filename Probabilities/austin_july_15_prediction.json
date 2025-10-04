@@ -1,21 +1,22 @@
 {
   "probabilities": {
-    "very_hot": 64.9,
+    "very_hot": 64.8,
     "very_cold": 0.0,
-    "very_wet": 6.2,
+    "very_wet": 3.6,
     "very_windy": 0.0,
-    "very_uncomfortable": 11.6
+    "very_uncomfortable": 10.9
   },
   "predicted_values": {
-    "T2M": 29.84,
-    "T2M_MAX": 36.15,
-    "T2M_MIN": 24.24,
-    "PRECTOTCORR": 1.95,
-    "WS2M": 2.58,
-    "RH2M": 65.03,
-    "T2MWET": 25.54,
+    "T2M": 29.89,
+    "T2M_MAX": 36.34,
+    "T2M_MIN": 24.19,
+    "PRECTOTCORR": 1.47,
+    "WS2M": 2.6,
+    "WD2M": 169.5,
+    "RH2M": 65.16,
+    "T2MWET": 25.59,
     "IMERG_PRECLIQUID_PROB": -999.0,
-    "CLRSKY_SFC_SW_DWN": 7.82,
+    "CLRSKY_SFC_SW_DWN": 7.84,
     "feeling": "Hot",
     "precipitation": true,
     "air_quality": 5
@@ -26,10 +27,65 @@
     "T2M_MIN": "high",
     "PRECTOTCORR": "high",
     "WS2M": "high",
+    "WD2M": "high",
     "RH2M": "high",
     "T2MWET": "high",
     "IMERG_PRECLIQUID_PROB": "high",
     "CLRSKY_SFC_SW_DWN": "high"
+  },
+  "uncertainty": {
+    "predicted_values": {
+      "T2M": {
+        "margin_of_error": 0.36,
+        "confidence_interval_width": 0.72,
+        "confidence_level": "95%"
+      },
+      "T2M_MAX": {
+        "margin_of_error": 0.55,
+        "confidence_interval_width": 1.1,
+        "confidence_level": "95%"
+      },
+      "T2M_MIN": {
+        "margin_of_error": 0.22,
+        "confidence_interval_width": 0.45,
+        "confidence_level": "95%"
+      },
+      "PRECTOTCORR": {
+        "margin_of_error": 0.71,
+        "confidence_interval_width": 1.41,
+        "confidence_level": "95%"
+      },
+      "WS2M": {
+        "margin_of_error": 0.12,
+        "confidence_interval_width": 0.24,
+        "confidence_level": "95%"
+      },
+      "WD2M": {
+        "margin_of_error": 7.64,
+        "confidence_interval_width": 15.28,
+        "confidence_level": "95%"
+      },
+      "RH2M": {
+        "margin_of_error": 1.76,
+        "confidence_interval_width": 3.52,
+        "confidence_level": "95%"
+      },
+      "T2MWET": {
+        "margin_of_error": 0.12,
+        "confidence_interval_width": 0.24,
+        "confidence_level": "95%"
+      },
+      "IMERG_PRECLIQUID_PROB": {
+        "margin_of_error": 0.0,
+        "confidence_interval_width": 0.0,
+        "confidence_level": "95%"
+      },
+      "CLRSKY_SFC_SW_DWN": {
+        "margin_of_error": 0.04,
+        "confidence_interval_width": 0.07,
+        "confidence_level": "95%"
+      }
+    }
   },
   "metadata": {
     "location": {
@@ -37,15 +93,16 @@
       "latitude": 30.2672
     },
     "data_points_used": {
-      "T2M": 225,
-      "T2M_MAX": 225,
-      "T2M_MIN": 225,
-      "PRECTOTCORR": 225,
-      "WS2M": 225,
-      "RH2M": 225,
-      "T2MWET": 225,
-      "IMERG_PRECLIQUID_PROB": 225,
-      "CLRSKY_SFC_SW_DWN": 225
+      "T2M": 165,
+      "T2M_MAX": 165,
+      "T2M_MIN": 165,
+      "PRECTOTCORR": 165,
+      "WS2M": 165,
+      "WD2M": 165,
+      "RH2M": 165,
+      "T2MWET": 165,
+      "IMERG_PRECLIQUID_PROB": 165,
+      "CLRSKY_SFC_SW_DWN": 165
     },
     "parameters_requested": [
       "T2M",
@@ -53,6 +110,7 @@
       "T2M_MIN",
       "PRECTOTCORR",
       "WS2M",
+      "WD2M",
       "RH2M",
       "T2MWET",
       "IMERG_PRECLIQUID_PROB",
