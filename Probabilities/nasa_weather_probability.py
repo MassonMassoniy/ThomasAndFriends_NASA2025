@@ -5,6 +5,7 @@ A dynamic script to query NASA Power API for weather data and predict probabilit
 """
 
 import requests
+import math
 import json
 import datetime
 from typing import Dict, List, Any, Optional, Tuple
@@ -255,8 +256,9 @@ class NASAWeatherProbability:
             mean_val = sum(values) / len(values)
             std_val = (sum((x - mean_val) ** 2 for x in values) / len(values)) ** 0.5
             
+
             predicted_values[param] = round(mean_val, 2)
-            
+
             # Calculate probabilities based on parameter type
             if param == 'T2M' or param == 'T2M_MAX':
                 # Temperature probabilities
@@ -280,7 +282,7 @@ class NASAWeatherProbability:
                 # Humidity probability
                 uncomfortable_count = sum(1 for v in values if v > self.THRESHOLDS['very_uncomfortable_humidity'])
                 probabilities['very_uncomfortable'] = round((uncomfortable_count / len(values)) * 100, 1)
-        
+        predicted_values['T2M_trend'] = self.calculate_predicted_T2M(seasonal_data)
         results['probabilities'] = probabilities
         results['predicted_values'] = predicted_values
         results['confidence'] = confidence
@@ -311,6 +313,66 @@ class NASAWeatherProbability:
         
         return results
     
+    def calculate_predicted_T2M(self, seasonal_data: Dict[str, List[float]]) -> Optional[float]:
+        """Calculate predicted T2M value from seasonal data using a weighted recent mean + annual rate.
+        Select only the central day from each year's tolerance window (the 8th value of ~15) by sampling
+        one value per year before computing trend and weighted mean.
+        """
+        if 'T2M' not in seasonal_data or not seasonal_data['T2M']:
+            return None
+
+        all_values = seasonal_data['T2M']  # list containing ~15 values per year (ordered chronologically)
+        total_vals = len(all_values)
+        # expected number of years in the series
+        expected_years = max(1, (self.end_year - self.start_year + 1))
+
+        # approximate block size (number of samples per year). fallback to 1 to avoid zero division.
+        block_size = max(1, total_vals // expected_years)
+
+        # central index in each block (0-based). For block_size=15 this gives 7 (the 8th value).
+        center_idx = block_size // 2
+
+        # collect one sample per year: the central value of each block
+        year_samples: List[Tuple[int, float]] = []
+        for i in range(expected_years):
+            idx = i * block_size + center_idx
+            if idx < total_vals:
+                year = self.start_year + i
+                year_samples.append((year, float(all_values[idx])))
+
+        # If we couldn't form year_samples by blocks (e.g., uneven data), as a fallback try every 8th element
+        if not year_samples:
+            sampled = all_values[7::8] if total_vals > 7 else all_values[::max(1, total_vals)]
+            year_samples = [
+                (self.start_year + i, float(v)) for i, v in enumerate(sampled)
+            ]
+
+        # compute slope (°C/year) and weighted recent mean using the selected per-year samples
+        years = [y for (y, _v) in year_samples]
+        vals = [v for (_y, v) in year_samples]
+
+        if not years or not vals:
+            return None
+
+        n = len(years)
+        if n < 2:
+            slope = 0.0
+        else:
+            avg_year = sum(years) / n
+            avg_val = sum(vals) / n
+            num = sum((years[i] - avg_year) * (vals[i] - avg_val) for i in range(n))
+            den = sum((years[i] - avg_year) ** 2 for i in range(n))
+            slope = (num / den) if den != 0 else 0.0
+
+        # weighted recent mean: give more weight to recent years (decay controls emphasis)
+        decay = 0.25
+        max_year = max(years)
+        weights = [math.exp(decay * (y - max_year)) for y in years]
+        weighted_mean = sum(w * v for w, v in zip(weights, vals)) / sum(weights)
+
+        predicted = round(weighted_mean + slope, 2)
+        return predicted
+
     def predict_weather_for_date(self, target_date: str, parameters: Optional[List[str]] = None, tolerance_days: int = 7) -> Dict[str, Any]:
         """
         Main method to predict weather for a specific date

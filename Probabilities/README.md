@@ -2,7 +2,7 @@
 
 ## Input:
 - The locationformat: {longitude:int value, latitude:int value}
-- The date format: String year/month/day/hour
+- The date format: String YYYYMMDD
 
 ## Parameters that we consider:
 - **T2M** - Air Temperature at 2 meters (°C)
@@ -42,6 +42,7 @@ The script returns a comprehensive JSON object with the following structure:
     "PRECTOTCORR": 1.83,        // Predicted precipitation (mm/day)
     "WS2M": 3.2,                // Predicted wind speed at 2m (m/s)
     "RH2M": 65.0,               // Predicted relative humidity (%)
+    "T2M_trend": 30.76,          // Predicted value which is calculated with advanced algorithm
     "feeling": "Hot",            // Derived feeling: "Hot" (>25°C) or "Cold" (≤25°C)
     "precipitation": true,       // Boolean: true if precipitation > 1.0mm/day
     "air_quality": 7            // Air quality index (0-10): 3=Poor, 5=Moderate, 7=Fair, 8=Good
