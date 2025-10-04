@@ -71,6 +71,12 @@ input[type="text"] {
     background-color: rgb(255, 255, 255);
 }
 
+#map{
+    position:fixed;
+    height: 40%;
+    width: 50%;
+}
+
 /* Button parameters */
 button {
     display: inline-block;
