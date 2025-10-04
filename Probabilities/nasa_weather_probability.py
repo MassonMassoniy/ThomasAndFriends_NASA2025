@@ -12,6 +12,7 @@ from typing import Dict, List, Any, Optional, Tuple
 import argparse
 import sys
 from collections import defaultdict
+import math
 
 
 class NASAWeatherProbability:
@@ -24,6 +25,7 @@ class NASAWeatherProbability:
         'T2M_MIN': 'Daily Minimum Temperature (°C)',
         'PRECTOTCORR': 'Corrected Total Precipitation (mm/day)',
         'WS2M': 'Wind Speed at 2 meters (m/s)',
+        'WD2M': 'Wind Direction at 2 meters (degrees)',
         'RH2M': 'Relative Humidity at 2 meters (%)',
         'T2MWET': 'Wet-bulb Temperature at 2 meters (°C)',
         'IMERG_PRECLIQUID_PROB': 'Probability of Liquid Precipitation',
@@ -39,24 +41,62 @@ class NASAWeatherProbability:
         'very_uncomfortable_humidity': 80.0  # %
     }
     
-    def __init__(self, longitude: float, latitude: float, start_year: int = 2010, end_year: int = 2024):
+    def __init__(self, longitude: float, latitude: float, start_year: Optional[int] = None, end_year: Optional[int] = None):
         """
         Initialize the NASA Weather Probability estimator
         
         Args:
             longitude: Longitude coordinate
             latitude: Latitude coordinate
-            start_year: Start year for data collection (default: 2010)
-            end_year: End year for data collection (default: 2024)
+            start_year: Start year for data collection (if None, uses current_year - 11)
+            end_year: End year for data collection (if None, uses current_year - 1)
         """
         self.longitude = longitude
         self.latitude = latitude
-        self.start_year = start_year
-        self.end_year = end_year
+        
+        # Set dynamic year range if not provided
+        current_year = datetime.datetime.now().year
+        self.start_year = start_year if start_year is not None else current_year - 11
+        self.end_year = end_year if end_year is not None else current_year - 1
+        
         self.base_url = "https://power.larc.nasa.gov/api/temporal/daily/point"
         
         # Use all available parameters by default
         self.default_parameters = list(self.AVAILABLE_PARAMETERS.keys())
+    
+    def calculate_confidence_interval(self, values: List[float], confidence_level: float = 0.95) -> Tuple[float, float]:
+        """
+        Calculate confidence interval for a list of values
+        
+        Args:
+            values: List of numeric values
+            confidence_level: Confidence level (default: 0.95 for 95% CI)
+            
+        Returns:
+            Tuple of (margin_of_error, confidence_interval_width)
+        """
+        if len(values) < 2:
+            return 0.0, 0.0
+        
+        n = len(values)
+        mean_val = sum(values) / n
+        
+        # Calculate standard error
+        variance = sum((x - mean_val) ** 2 for x in values) / (n - 1)
+        std_error = math.sqrt(variance / n)
+        
+        # Calculate t-value for 95% confidence (approximation for large samples)
+        # For n > 30, we can use z-score of 1.96 for 95% CI
+        if n > 30:
+            t_value = 1.96
+        else:
+            # For smaller samples, use t-distribution approximation
+            # This is a simplified approach - in practice you'd use scipy.stats
+            t_value = 2.0 if n > 10 else 2.5
+        
+        margin_of_error = t_value * std_error
+        return margin_of_error, margin_of_error * 2
+    
         
     def build_api_url(self, parameters: List[str], start_date: str, end_date: str) -> str:
         """
@@ -227,6 +267,9 @@ class NASAWeatherProbability:
             'probabilities': {},
             'predicted_values': {},
             'confidence': {},
+            'uncertainty': {
+                'predicted_values': {}
+            },
             'metadata': {
                 'location': {'longitude': self.longitude, 'latitude': self.latitude},
                 'data_points_used': {},
@@ -237,6 +280,7 @@ class NASAWeatherProbability:
         probabilities = {}
         predicted_values = {}
         confidence = {}
+        pred_uncertainty = {}
         
         for param in parameters:
             if param not in seasonal_data or not seasonal_data[param]:
@@ -258,7 +302,15 @@ class NASAWeatherProbability:
             
 
             predicted_values[param] = round(mean_val, 2)
-
+            
+            # Calculate uncertainty for predicted values
+            margin_error, ci_width = self.calculate_confidence_interval(values)
+            pred_uncertainty[param] = {
+                'margin_of_error': round(margin_error, 2),
+                'confidence_interval_width': round(ci_width, 2),
+                'confidence_level': '95%'
+            }
+            
             # Calculate probabilities based on parameter type
             if param == 'T2M' or param == 'T2M_MAX':
                 # Temperature probabilities
@@ -286,6 +338,7 @@ class NASAWeatherProbability:
         results['probabilities'] = probabilities
         results['predicted_values'] = predicted_values
         results['confidence'] = confidence
+        results['uncertainty']['predicted_values'] = pred_uncertainty
         
         # Add derived predictions
         if 'T2M' in predicted_values:
@@ -444,8 +497,15 @@ def main():
                        choices=list(NASAWeatherProbability.AVAILABLE_PARAMETERS.keys()),
                        default=None,
                        help='Parameters to request from NASA API (if not specified, uses all available parameters)')
-    parser.add_argument('--start-year', type=int, default=2010, help='Start year for data collection (default: 2010)')
-    parser.add_argument('--end-year', type=int, default=2024, help='End year for data collection (default: 2024)')
+    # Calculate dynamic defaults
+    current_year = datetime.datetime.now().year
+    default_start_year = current_year - 11
+    default_end_year = current_year - 1
+    
+    parser.add_argument('--start-year', type=int, default=None, 
+                       help=f'Start year for data collection (default: {default_start_year} - current year - 11)')
+    parser.add_argument('--end-year', type=int, default=None, 
+                       help=f'End year for data collection (default: {default_end_year} - current year - 1)')
     parser.add_argument('--tolerance-days', type=int, default=7, help='Days before/after target date to include (default: 7)')
     parser.add_argument('--output', type=str, help='Output file path (optional)')
     
@@ -458,6 +518,9 @@ def main():
         start_year=args.start_year,
         end_year=args.end_year
     )
+    
+    # Print the year range being used
+    print(f"Using year range: {estimator.start_year} to {estimator.end_year}")
     
     # Use all parameters if none specified
     parameters = args.parameters if args.parameters else None
