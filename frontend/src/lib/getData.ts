@@ -39,6 +39,7 @@ probabilities: z
       T2M_MIN: z.number(),       // °C
       PRECTOTCORR: z.number(),   // mm/day
       WS2M: z.number(),          // m/s
+      WD2M: z.number().optional(), // degrees (0-360)
       RH2M: z.number().min(0).max(100), // %
       feeling: Feeling,
       precipitation: z.boolean(), 
