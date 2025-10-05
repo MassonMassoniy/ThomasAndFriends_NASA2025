@@ -13,7 +13,7 @@ def index():
 
 
 # ------ APIs ------
-@app.route('/getWeather', methods=['GET'])
+@app.route('/api/getWeather', methods=['GET'])
 def getWeather():
     latitude = request.args.get('latitude', type=float)
     longitude = request.args.get('longitude', type=float)
