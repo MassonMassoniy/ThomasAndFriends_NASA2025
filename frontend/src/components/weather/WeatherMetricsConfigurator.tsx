@@ -44,7 +44,8 @@ export type CardKey =
   | "probVeryCold"
   | "probVeryWindy"
   | "probVeryWet"
-  | "probVeryUncomfortable";
+  | "probVeryUncomfortable"
+  | "T2M_trend"; // <-- Added
 
 /** Small helpers */
 const pct = (n: number) => `${n.toFixed(1)}%`;
@@ -186,6 +187,16 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
         <div className="col-span-full mt-3">
           <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Predicted Values</h3>
         </div>
+      )}
+
+      {show("T2M_trend") && data.predicted_values.T2M_trend !== undefined && (
+        <Item
+          title="Air Temp Trend"
+          value={celsius(data.predicted_values.T2M_trend)}
+          sub="Weighted recent mean + annual rate"
+          badge={<Badge variant="light" color="info">Trend</Badge>}
+          icon={<ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />}
+        />
       )}
 
       {show("airTemp") && (
@@ -371,6 +382,7 @@ const ALL_KEYS: CardKey[] = [
   "probVeryWindy",
   "probVeryWet",
   "probVeryUncomfortable",
+  "T2M_trend", // <-- Added
 ];
 
 const LABELS: Record<CardKey, string> = {
@@ -388,6 +400,7 @@ const LABELS: Record<CardKey, string> = {
   probVeryWindy: "Prob. Very Windy",
   probVeryWet: "Prob. Very Wet",
   probVeryUncomfortable: "Prob. Very Uncomfortable",
+  T2M_trend: "Air Temp Trend", // <-- Added
 };
 
 const STORAGE_KEY = "weather.visibleCards.v1";
