@@ -36,107 +36,100 @@ const lat = z.number().min(-90).max(90);
 const lon = z.number().min(-180).max(180);
 
 /** "MM/DD" with leading zero optional on month/day (e.g., 7/5 or 07/05) */
-const targetDate = z
-  .string()
-  .regex(/^(0?[1-9]|1[0-2])\/(0?[1-9]|[12]\d|3[01])$/, 'Expected "MM/DD"');
 
-export const WeatherData = z
-  .object({
-    probabilities: z
-      .object({
-        very_hot: pct, // > 35°C
-        very_cold: pct, // < -10°C
-        very_windy: pct, // > 10 m/s
-        very_wet: pct, // > 10 mm/day
-        very_uncomfortable: pct, // > 80% RH
-      })
-      .strict(),
+export const WeatherData = z.object({
+  probabilities: z.object({
+    very_hot: pct,
+    very_cold: pct,
+    very_windy: pct,
+    very_wet: pct,
+    very_uncomfortable: pct,
+  }).strict(),
 
-    predicted_values: z
-      .object({
-        T2M: z.number(), // °C
-        T2M_MAX: z.number(), // °C
-        T2M_MIN: z.number(), // °C
-        PRECTOTCORR: z.number(), // mm/day
-        WS2M: z.number(), // m/s
-        WD2M: z.number().min(0).max(360), // degrees
-        RH2M: z.number().min(0).max(100), // %
-        T2M_trend: z.number(), // °C (derived)
-        feeling: Feeling,
-        precipitation: z.boolean(),
-        air_quality: airQuality, // 0–10
-      })
-      .strict(),
+  predicted_values: z.object({
+    T2M: z.number(),
+    T2M_MAX: z.number(),
+    T2M_MIN: z.number(),
+    PRECTOTCORR: z.number(),
+    WS2M: z.number(),
+    WD2M: z.number().min(0).max(360),
+    RH2M: z.number().min(0).max(100),
+    T2M_trend: z.number(),
+    feeling: Feeling,
+    precipitation: z.boolean(),
+    air_quality: airQuality,
 
-    confidence: z
-      .object({
-        T2M: Confidence,
-        T2M_MAX: Confidence,
-        T2M_MIN: Confidence,
-        PRECTOTCORR: Confidence,
-        WS2M: Confidence,
-        WD2M: Confidence,
-        RH2M: Confidence,
-        T2MWET: Confidence,
-        IMERG_PRECLIQUID_PROB: Confidence,
-        CLRSKY_SFC_SW_DWN: Confidence,
-      })
-      .strict(),
+    // ✅ add the new ones seen in your JSON
+    T2MWET: z.number(),
+    IMERG_PRECLIQUID_PROB: z.number(),   // (often -999 sentinel is fine; it’s still a number)
+    CLRSKY_SFC_SW_DWN: z.number(),
+  }).strict(),
 
-    /** ✅ New block */
-    uncertainty: z
-      .object({
-        predicted_values: z
-          .object({
-            T2M: MeasurementUncertainty,
-            T2M_MAX: MeasurementUncertainty,
-            T2M_MIN: MeasurementUncertainty,
-            PRECTOTCORR: MeasurementUncertainty,
-            WS2M: MeasurementUncertainty,
-            WD2M: MeasurementUncertainty,
-            RH2M: MeasurementUncertainty,
-            T2MWET: MeasurementUncertainty,
-            IMERG_PRECLIQUID_PROB: MeasurementUncertainty,
-            CLRSKY_SFC_SW_DWN: MeasurementUncertainty,
-          })
-          .strict(),
-      })
-      .strict(),
+  confidence: z.object({
+    T2M: Confidence,
+    T2M_MAX: Confidence,
+    T2M_MIN: Confidence,
+    PRECTOTCORR: Confidence,
+    WS2M: Confidence,
+    WD2M: Confidence,
+    RH2M: Confidence,
+    T2MWET: Confidence,
+    IMERG_PRECLIQUID_PROB: Confidence,
+    CLRSKY_SFC_SW_DWN: Confidence,
+  }).strict(),
 
-    metadata: z
-      .object({
-        location: z
-          .object({
-            longitude: lon,
-            latitude: lat,
-          })
-          .strict(),
+  uncertainty: z.object({
+    predicted_values: z.object({
+      T2M: MeasurementUncertainty,
+      T2M_MAX: MeasurementUncertainty,
+      T2M_MIN: MeasurementUncertainty,
+      PRECTOTCORR: MeasurementUncertainty,
+      WS2M: MeasurementUncertainty,
+      WD2M: MeasurementUncertainty,
+      RH2M: MeasurementUncertainty,
+      T2MWET: MeasurementUncertainty,
+      IMERG_PRECLIQUID_PROB: MeasurementUncertainty,
+      CLRSKY_SFC_SW_DWN: MeasurementUncertainty,
+    }).strict(),
+  }).strict(),
 
-        data_points_used: z
-          .object({
-            T2M: nonNegInt,
-            T2M_MAX: nonNegInt,
-            T2M_MIN: nonNegInt,
-            PRECTOTCORR: nonNegInt,
-            WS2M: nonNegInt,
-            WD2M: nonNegInt,
-            RH2M: nonNegInt,
-            T2MWET: nonNegInt,
-            IMERG_PRECLIQUID_PROB: nonNegInt,
-            CLRSKY_SFC_SW_DWN: nonNegInt,
-          })
-          .strict(),
+  metadata: z.object({
+    location: z.object({
+      longitude: lon,
+      latitude: lat,
+    }).strict(),
 
-        parameters_requested: z.array(ParamKey).nonempty(),
+    data_points_used: z.object({
+      T2M: nonNegInt,
+      T2M_MAX: nonNegInt,
+      T2M_MIN: nonNegInt,
+      PRECTOTCORR: nonNegInt,
+      WS2M: nonNegInt,
+      WD2M: nonNegInt,
+      RH2M: nonNegInt,
+      T2MWET: nonNegInt,
+      IMERG_PRECLIQUID_PROB: nonNegInt,
+      CLRSKY_SFC_SW_DWN: nonNegInt,
+    }).strict(),
 
-        target_date: targetDate, // "MM/DD"
-        target_month: z.number().int().min(1).max(12),
-        target_day: z.number().int().min(1).max(31),
-        tolerance_days: z.number().int().min(0),
-      })
-      .strict(),
-  })
-  .strict();
+    parameters_requested: z.array(z.enum([
+      "T2M","T2M_MAX","T2M_MIN","PRECTOTCORR","WS2M","WD2M","RH2M",
+      "T2MWET","IMERG_PRECLIQUID_PROB","CLRSKY_SFC_SW_DWN"
+    ])).nonempty(),
+
+    // // ✅ accept new format
+    // target_date: z.string,
+    // target_month: z.number().int().min(1).max(12),
+    // target_day: z.number().int().min(1).max(31),
+    // tolerance_days: z.number().int().min(0),
+
+    // ✅ seen in your JSON
+    derived_parameters: z.array(z.string()).default([]).optional(),
+  }),
+
+  // ✅ if your root sometimes contains weather_conditions, allow it (optional)
+  weather_conditions: z.any().optional(),
+});
 
 export type WeatherData = z.infer<typeof WeatherData>;
 
@@ -144,10 +137,11 @@ export type WeatherData = z.infer<typeof WeatherData>;
 // return
 // date: String YYYYMMDD
 export async function getWeatherData(latitude: number, longitude: number, date: string) {
-    const result = await fetch('/api/getWeather?latitude=${latitude}&longitude=${longitude}&date=${date}', {
+    const result = await fetch(`https://drmy-server-fast.tail8afd19.ts.net/api/getWeather?latitude=${latitude}&longitude=${longitude}&date=${date}`, {
         next: { revalidate: 360000, tags: ["weather"]},
     });
-
-    const json = await result.json;
+    console.log(await result)
+    const json = await result.json();
+    console.log(json);
     return WeatherData.parse(json);
 }
