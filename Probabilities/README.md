@@ -24,6 +24,25 @@
 - api-parameters: https://power.larc.nasa.gov/parameters/
 - docs: https://power.larc.nasa.gov/docs/services/api/temporal/daily/
 
+
+## 🧠 Use of Artificial Intelligence (AI):
+
+This project utilized **Artificial Intelligence (AI)** tools to accelerate parts of the development process in accordance with the [NASA Space Apps Challenge guidelines](https://www.spaceappschallenge.org/).
+
+AI was used to assist with:
+- Code generation and debugging for the NASA POWER API integration.  
+- Drafting documentation and explanations (e.g., this README and project descriptions).  
+- Idea refinement and design brainstorming.  
+
+All AI-generated text and code were reviewed, tested, and modified by the project team to ensure originality, correctness, and alignment with project goals.  
+No AI-generated content includes or modifies **NASA branding, logos, flags, or mission identifiers**.  
+
+If any AI-generated media (images, audio, or video) are included, they are:
+- **Watermarked** as “AI-generated.”  
+- **Acknowledged** as AI-assisted in their metadata or accompanying descriptions.  
+
+The intent of using AI was to enhance creativity and innovation, while maintaining transparency and compliance with NASA Space Apps requirements.
+
 ## Output JSON Structure:
 
 The script returns a comprehensive JSON object with the following structure:
