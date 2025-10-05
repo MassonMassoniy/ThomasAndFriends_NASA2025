@@ -1,3 +1,5 @@
+# This code only runs the home page of the site and provides api for using the probability calculator
+
 from flask import Flask, render_template, request
 from Probabilities.nasa_weather_probability import NASAWeatherProbability
 
