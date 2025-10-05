@@ -36,9 +36,26 @@ class NASAWeatherProbability:
     THRESHOLDS = {
         'very_hot_temp': 35.0,  # °C
         'very_cold_temp': -10.0,  # °C
-        'very_windy_speed': 10.0,  # m/s
-        'very_wet_precip': 10.0,  # mm/day
-        'very_uncomfortable_humidity': 80.0  # %
+        'very_windy_speed': 10.0,  # m/s (Strong wind)
+        'very_wet_precip': 10.0,  # mm/day (Heavy rain)
+        'very_uncomfortable_humidity': 80.0  # % (Muggy)
+    }
+    
+    # Additional thresholds for weather conditions
+    WEATHER_THRESHOLDS = {
+        'heavy_rain': 10.0,      # mm/day
+        'moderate_rain': 1.0,    # mm/day
+        'strong_wind': 10.0,     # m/s
+        'breezy_wind': 5.0,      # m/s
+        'muggy_humidity': 80.0,  # %
+        'dry_humidity': 30.0,    # %
+        'hot_feeling': 25.0,     # °C - threshold for "Hot" vs "Cold" feeling
+        'warm_feeling': 15.0,     # °C - threshold for "Warm" vs "Cold" feeling
+        'cold_feeling': 0.0,     # °C - threshold for "Cold" vs "Very Cold" feeling
+        'excellent_air': 9,      # air quality index
+        'good_air': 8,           # air quality index
+        'fair_air': 7,           # air quality index
+        'moderate_air': 5        # air quality index
     }
     
     def __init__(self, longitude: float, latitude: float, start_year: Optional[int] = None, end_year: Optional[int] = None):
@@ -273,7 +290,9 @@ class NASAWeatherProbability:
             'metadata': {
                 'location': {'longitude': self.longitude, 'latitude': self.latitude},
                 'data_points_used': {},
-                'parameters_requested': parameters
+                'parameters_requested': parameters,
+                # add container for any derived values produced during calculation
+                'derived_parameters': []
             }
         }
         
@@ -281,7 +300,6 @@ class NASAWeatherProbability:
         predicted_values = {}
         confidence = {}
         pred_uncertainty = {}
-        
         for param in parameters:
             if param not in seasonal_data or not seasonal_data[param]:
                 continue
@@ -334,35 +352,105 @@ class NASAWeatherProbability:
                 # Humidity probability
                 uncomfortable_count = sum(1 for v in values if v > self.THRESHOLDS['very_uncomfortable_humidity'])
                 probabilities['very_uncomfortable'] = round((uncomfortable_count / len(values)) * 100, 1)
-        predicted_values['T2M_trend'] = self.calculate_predicted_T2M(seasonal_data)
+        
+        # Compute derived values (e.g., trend) only when appropriate data exists.
+        derived_params = []
+        if 'T2M' in seasonal_data and seasonal_data['T2M']:
+            t2m_trend = self.calculate_predicted_T2M(seasonal_data)
+            if t2m_trend is not None:
+                results['predicted_values']['T2M_trend'] = t2m_trend
+                derived_params.append('T2M_trend')
+        
+        # finalize results
         results['probabilities'] = probabilities
-        results['predicted_values'] = predicted_values
+        results['predicted_values'].update(predicted_values)
         results['confidence'] = confidence
         results['uncertainty']['predicted_values'] = pred_uncertainty
+        
+        # record derived parameters in metadata
+        if derived_params:
+            results['metadata']['derived_parameters'] = derived_params
         
         # Add derived predictions
         if 'T2M' in predicted_values:
             temp = predicted_values['T2M']
-            results['predicted_values']['feeling'] = "Hot" if temp > 25 else "Cold"
+            results['predicted_values']['feeling'] = (
+                "Hot" if temp > self.WEATHER_THRESHOLDS['hot_feeling']
+                else "Warm" if temp > self.WEATHER_THRESHOLDS['warm_feeling']
+                else "Cold"
+            )
         
         if 'PRECTOTCORR' in predicted_values:
             precip = predicted_values['PRECTOTCORR']
-            results['predicted_values']['precipitation'] = precip > 1.0
+            results['predicted_values']['precipitation'] = precip > self.WEATHER_THRESHOLDS['moderate_rain']
         
-        # Air quality estimation (simplified based on humidity and precipitation)
+        # Air quality estimation based on humidity and precipitation
         air_quality = 5  # Default moderate
         if 'RH2M' in predicted_values and 'PRECTOTCORR' in predicted_values:
             humidity = predicted_values['RH2M']
             precip = predicted_values['PRECTOTCORR']
             
-            if humidity > 80 and precip > 5:
+            # Air quality calculation following the JavaScript logic
+            if humidity >= 80 and precip >= 10:  # Muggy + Heavy rain = Poor
                 air_quality = 3  # Poor
-            elif humidity < 40 and precip < 1:
+            elif humidity <= 30 and precip < 1:  # Dry + Minimal rain = Excellent
+                air_quality = 9  # Excellent
+            elif humidity < 60 and precip < 2:   # Comfortable + Light rain = Good
                 air_quality = 8  # Good
-            elif humidity < 60 and precip < 2:
+            elif humidity < 70 and precip < 5:   # Comfortable + Moderate rain = Fair
                 air_quality = 7  # Fair
+            else:
+                air_quality = 5  # Moderate (default)
         
         results['predicted_values']['air_quality'] = air_quality
+        
+        # Add weather condition labels following JavaScript logic
+        weather_conditions = {}
+        
+        # Precipitation condition
+        if 'PRECTOTCORR' in predicted_values:
+            precip = predicted_values['PRECTOTCORR']
+            if precip >= self.WEATHER_THRESHOLDS['heavy_rain']:
+                weather_conditions['precipitation_condition'] = "Heavy rain risk"
+            elif precip >= self.WEATHER_THRESHOLDS['moderate_rain']:
+                weather_conditions['precipitation_condition'] = "Light to moderate"
+            else:
+                weather_conditions['precipitation_condition'] = "Minimal"
+        
+        # Wind condition
+        if 'WS2M' in predicted_values:
+            wind_speed = predicted_values['WS2M']
+            if wind_speed >= self.WEATHER_THRESHOLDS['strong_wind']:
+                weather_conditions['wind_condition'] = "Strong"
+            elif wind_speed >= self.WEATHER_THRESHOLDS['breezy_wind']:
+                weather_conditions['wind_condition'] = "Breezy"
+            else:
+                weather_conditions['wind_condition'] = "Calm"
+        
+        # Humidity condition
+        if 'RH2M' in predicted_values:
+            humidity = predicted_values['RH2M']
+            if humidity >= self.WEATHER_THRESHOLDS['muggy_humidity']:
+                weather_conditions['humidity_condition'] = "Muggy"
+            elif humidity <= self.WEATHER_THRESHOLDS['dry_humidity']:
+                weather_conditions['humidity_condition'] = "Dry"
+            else:
+                weather_conditions['humidity_condition'] = "Comfortable"
+        
+        # Air quality label
+        if air_quality >= self.WEATHER_THRESHOLDS['excellent_air']:
+            weather_conditions['air_quality_label'] = "Excellent"
+        elif air_quality >= self.WEATHER_THRESHOLDS['good_air']:
+            weather_conditions['air_quality_label'] = "Good"
+        elif air_quality >= self.WEATHER_THRESHOLDS['fair_air']:
+            weather_conditions['air_quality_label'] = "Fair"
+        elif air_quality >= self.WEATHER_THRESHOLDS['moderate_air']:
+            weather_conditions['air_quality_label'] = "Moderate"
+        else:
+            weather_conditions['air_quality_label'] = "Poor"
+        
+        # Add weather conditions to results
+        results['weather_conditions'] = weather_conditions
         
         return results
     
@@ -374,7 +462,7 @@ class NASAWeatherProbability:
         if 'T2M' not in seasonal_data or not seasonal_data['T2M']:
             return None
 
-        all_values = seasonal_data['T2M']  # list containing ~15 values per year (ordered chronologically)
+        all_values = seasonal_data['T2M']  # list containing ~x values per year (ordered chronologically) because of tolerance window
         total_vals = len(all_values)
         # expected number of years in the series
         expected_years = max(1, (self.end_year - self.start_year + 1))
@@ -382,7 +470,7 @@ class NASAWeatherProbability:
         # approximate block size (number of samples per year). fallback to 1 to avoid zero division.
         block_size = max(1, total_vals // expected_years)
 
-        # central index in each block (0-based). For block_size=15 this gives 7 (the 8th value).
+        # central index in each block (0-based). Example: for block_size=15 this gives 7 (the 8th value).
         center_idx = block_size // 2
 
         # collect one sample per year: the central value of each block
@@ -395,7 +483,18 @@ class NASAWeatherProbability:
 
         # If we couldn't form year_samples by blocks (e.g., uneven data), as a fallback try every 8th element
         if not year_samples:
-            sampled = all_values[7::8] if total_vals > 7 else all_values[::max(1, total_vals)]
+            # Use center_idx and block_size to sample one central value per approximate-year block.
+            # This avoids the hardcoded step of 8 and adapts to different tolerance window sizes.
+            sampled = []
+            if center_idx < total_vals:
+                # step by block_size to pick the central element of each block
+                sampled = all_values[center_idx::block_size]
+
+            # If still empty (e.g., center_idx out of range), evenly sample across available values.
+            if not sampled:
+                step = max(1, total_vals // expected_years) if expected_years > 0 else 1
+                sampled = all_values[::step]
+
             year_samples = [
                 (self.start_year + i, float(v)) for i, v in enumerate(sampled)
             ]

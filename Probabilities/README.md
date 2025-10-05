@@ -31,18 +31,18 @@ The script returns a comprehensive JSON object with the following structure:
 ```json
 {
   "probabilities": {
-    "very_hot": 70.7,           // Percentage chance of very hot weather (>35°C)
+    "very_hot": 64.8,           // Percentage chance of very hot weather (>35°C)
     "very_cold": 0.0,           // Percentage chance of very cold weather (<-10°C)
-    "very_windy": 8.7,          // Percentage chance of very windy conditions (>10 m/s)
-    "very_wet": 12.3,           // Percentage chance of very wet conditions (>10mm/day)
-    "very_uncomfortable": 5.4   // Percentage chance of very uncomfortable humidity (>80%)
+    "very_windy": 0.0,          // Percentage chance of very windy conditions (>10 m/s)
+    "very_wet": 3.6,            // Percentage chance of very wet conditions (>10mm/day)
+    "very_uncomfortable": 10.9  // Percentage chance of very uncomfortable humidity (>80%)
   },
   "predicted_values": {
-    "T2M": 30.77,               // Predicted air temperature at 2m (°C)
-    "T2M_MAX": 37.43,           // Predicted daily maximum temperature (°C)
-    "T2M_MIN": 25.12,           // Predicted daily minimum temperature (°C)
-    "PRECTOTCORR": 1.83,        // Predicted precipitation (mm/day)
-    "WS2M": 3.2,                // Predicted wind speed at 2m (m/s)
+    "T2M": 29.89,               // Predicted air temperature at 2m (°C)
+    "T2M_MAX": 36.34,           // Predicted daily maximum temperature (°C)
+    "T2M_MIN": 24.19,           // Predicted daily minimum temperature (°C)
+    "PRECTOTCORR": 1.47,        // Predicted precipitation (mm/day)
+    "WS2M": 2.6,                // Predicted wind speed at 2m (m/s)
     "WD2M": 169.5,              // Predicted wind direction at 2m (degrees)
     "RH2M": 65.0,               // Predicted relative humidity (%)
     "T2M_trend": 30.76,          // Predicted value which is calculated with advanced algorithm (climate change)
@@ -53,16 +53,35 @@ The script returns a comprehensive JSON object with the following structure:
   "confidence": {
     "T2M": "high",              // Data confidence level: "low" (<5 points), "medium" (5-14), "high" (≥15)
     "T2M_MAX": "high",
+    "T2M_MIN": "high",
     "PRECTOTCORR": "high",
     "WS2M": "high",
     "WD2M": "high",
-    "RH2M": "high"
+    "RH2M": "high",
+    "T2MWET": "high",
+    "IMERG_PRECLIQUID_PROB": "high",
+    "CLRSKY_SFC_SW_DWN": "high"
   },
   "uncertainty": {
     "predicted_values": {
       "T2M": {
         "margin_of_error": 0.36,        // ±0.36°C at 95% confidence interval
         "confidence_interval_width": 0.72,  // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "T2M_MAX": {
+        "margin_of_error": 0.55,        // ±0.55°C at 95% confidence interval
+        "confidence_interval_width": 1.1,   // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "T2M_MIN": {
+        "margin_of_error": 0.22,        // ±0.22°C at 95% confidence interval
+        "confidence_interval_width": 0.45,  // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "PRECTOTCORR": {
+        "margin_of_error": 0.71,        // ±0.71 mm/day at 95% confidence interval
+        "confidence_interval_width": 1.41,  // Total width of 95% CI
         "confidence_level": "95%"
       },
       "WS2M": {
@@ -74,6 +93,26 @@ The script returns a comprehensive JSON object with the following structure:
         "margin_of_error": 7.64,        // ±7.64° at 95% confidence interval
         "confidence_interval_width": 15.28, // Total width of 95% CI
         "confidence_level": "95%"
+      },
+      "RH2M": {
+        "margin_of_error": 1.76,        // ±1.76% at 95% confidence interval
+        "confidence_interval_width": 3.52,  // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "T2MWET": {
+        "margin_of_error": 0.12,        // ±0.12°C at 95% confidence interval
+        "confidence_interval_width": 0.24,  // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "IMERG_PRECLIQUID_PROB": {
+        "margin_of_error": 0.0,         // ±0.0 at 95% confidence interval
+        "confidence_interval_width": 0.0,   // Total width of 95% CI
+        "confidence_level": "95%"
+      },
+      "CLRSKY_SFC_SW_DWN": {
+        "margin_of_error": 0.04,        // ±0.04 at 95% confidence interval
+        "confidence_interval_width": 0.07,  // Total width of 95% CI
+        "confidence_level": "95%"
       }
     }
   },
@@ -83,18 +122,28 @@ The script returns a comprehensive JSON object with the following structure:
       "latitude": 30.2672        // Input latitude coordinate
     },
     "data_points_used": {
-      "T2M": 75,                 // Number of historical data points used for this parameter
-      "T2M_MAX": 75,
-      "PRECTOTCORR": 75,
-      "WS2M": 75,
-      "RH2M": 75
+      "T2M": 165,                // Number of historical data points used for this parameter
+      "T2M_MAX": 165,
+      "T2M_MIN": 165,
+      "PRECTOTCORR": 165,
+      "WS2M": 165,
+      "WD2M": 165,
+      "RH2M": 165,
+      "T2MWET": 165,
+      "IMERG_PRECLIQUID_PROB": 165,
+      "CLRSKY_SFC_SW_DWN": 165
     },
-    "parameters_requested": [    // List of parameters requested from NASA API
+    "parameters_requested": [    // List of all parameters requested from NASA API
       "T2M",
-      "T2M_MAX", 
+      "T2M_MAX",
+      "T2M_MIN",
       "PRECTOTCORR",
       "WS2M",
-      "RH2M"
+      "WD2M",
+      "RH2M",
+      "T2MWET",
+      "IMERG_PRECLIQUID_PROB",
+      "CLRSKY_SFC_SW_DWN"
     ],
     "target_date": "07/15",      // Input target date
     "target_month": 7,           // Parsed target month
@@ -110,6 +159,7 @@ The script returns a comprehensive JSON object with the following structure:
 - **Probabilities**: Historical percentage chances of extreme weather conditions
 - **Predicted Values**: Mean values based on historical data for the same seasonal period
 - **Uncertainty Quantification**: 95% confidence intervals for all predicted values
+- **Weather Condition Labels**: Human-readable labels for precipitation, wind, humidity, and air quality
 - **Confidence Levels**: Indicates reliability based on sample size
 - **Metadata**: Complete information about the analysis parameters and data sources
 - **Zero Null Values**: NASA Power API provides 100% data completeness (no missing values)
