@@ -18,14 +18,16 @@
         <div class="input-container">
             <div class="input">
                 <input type="text" id="address" name="address" placeholder="Enter the full address">
-                <input type="date" name="date">
+                <input type="date" id="date" name="date">
             </div>
         </div>
         <div class="button-container">
             <button type="submit"><strong>Will it rain on my parade?</strong></button>
         </div>
     </div>
-    <!-- Script for map-->
+</body>
+
+<!-- Script for map-->
     <script type="module">
         // import L, { Map, TileLayer, Marker, Circle, Polygon, Popup } from 'leaflet';
 
@@ -37,17 +39,14 @@
             }).addTo(map);
 
         function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString())
-                .openOn(map);
+            console.log(e.latlng);
+
+            document.getElementById("address").value = "Using coordinates";
+            
         }
 
         map.on('click', onMapClick);
     </script>
-</body>
-
-
 
 <!-- Script to save the date in a variable -->
 <script>
