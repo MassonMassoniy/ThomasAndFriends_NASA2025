@@ -224,7 +224,9 @@
         if (date && lat && lng){
             window.location.href = `https://drmy-server-fast.tail8afd19.ts.net/?latitude=${lat}&longitude=${lng}&date=${date}`;
         } else if (!date){
-            alert("Enter the date!")
+            alert("Please, enter the date!")
+        } else if (!lat || !lng){
+            alert("Please, enter the location! You can either use the search bar or click on the map.")
         }
     }
 </script>
