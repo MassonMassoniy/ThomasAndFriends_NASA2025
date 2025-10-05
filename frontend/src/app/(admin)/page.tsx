@@ -47,8 +47,6 @@ const exampleData = {
   },
 } as const;
 
-type SP = Record<string, string | string[] | undefined>;
-type MaybePromise<T> = T | Promise<T>;
 
 
 export default async function Ecommerce({searchParams,
@@ -75,7 +73,7 @@ export default async function Ecommerce({searchParams,
       {/* <div className="col-span-11 space-y-6 xl:col-span-9"> */}
         {/* <EcommerceMetrics /> */}
                   <WeatherDataProvider initial={data}>
-        <WeatherMetrics data={exampleData}></WeatherMetrics>
+        <WeatherMetrics data={data}></WeatherMetrics>
         </WeatherDataProvider>
         {/* <MonthlySalesChart /> */}
       {/* </div> */}
