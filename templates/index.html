@@ -38,11 +38,29 @@
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
 
+        let marker = null;
+
         function onMapClick(e) {
             console.log(e.latlng);
 
             document.getElementById("address").value = "Using coordinates";
-            
+            const { lat, lng } = e.latlng;
+
+            // If marker already exists, move it; otherwise create it
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            // Store coords in variables
+            let selectedLatitude;
+            let selectedLongitude;
+            selectedLatitude = lat;
+            selectedLongitude = lng;
+
+            // Update the address field (you can replace with reverse geocoding later)
+            document.getElementById("address").value = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
         }
 
     map.on('click', onMapClick);
