@@ -14,14 +14,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const searchParams = useSearchParams();
-  const latitude = searchParams.get("latitude") ?? "49.9"
-  const longitude = searchParams.get("latitude") ?? "97.1"
-  const date = searchParams.get("date") ?? "20240606"
-  const [data, setData] = useState<null | WeatherData>(null);
-  useEffect(() => {
-    getWeatherData(+latitude, +longitude, date).then(setData).catch(console.error);
-  }, []);
+
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
   // Dynamic class for main content margin based on sidebar state
@@ -37,9 +30,8 @@ export default function AdminLayout({
         {/* Header */}
         <AppHeader />
         {/* Page Content */}
-          <WeatherDataProvider initial={data}>
+
             <div className="p-4 mx-auto md:p-6">{children}</div>
-          </WeatherDataProvider>
         
       </div>
     </div>

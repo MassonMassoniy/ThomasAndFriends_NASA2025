@@ -8,6 +8,11 @@ import RecentOrders from "@/components/ecommerce/RecentOrders";
 import DemographicCard from "@/components/ecommerce/DemographicCard";
 import { useWeatherData } from "@/context/WeatherDataContext";
 import WeatherMetrics from "@/components/weather/WeatherMetrics";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getWeatherData } from "@/lib/getData";
+import type { WeatherData } from "@/lib/getData";
+import { WeatherDataProvider } from "@/context/WeatherDataContext";
 
 export const metadata: Metadata = {
   title:
@@ -43,13 +48,24 @@ const exampleData = {
   },
 } as const;
 
+  const searchParams = useSearchParams();
+  const latitude = searchParams.get("latitude") ?? "49.9"
+  const longitude = searchParams.get("latitude") ?? "97.1"
+  const date = searchParams.get("date") ?? "20240606"
+  const [data, setData] = useState<null | WeatherData>(null);
+  useEffect(() => {
+    getWeatherData(+latitude, +longitude, date).then(setData).catch(console.error);
+  }, []);
+
 export default function Ecommerce() {
   const data = useWeatherData();
   return (
     <div>
       {/* <div className="col-span-11 space-y-6 xl:col-span-9"> */}
         {/* <EcommerceMetrics /> */}
+                  <WeatherDataProvider initial={data}>
         <WeatherMetrics data={exampleData}></WeatherMetrics>
+        </WeatherDataProvider>
         {/* <MonthlySalesChart /> */}
       {/* </div> */}
 
