@@ -174,7 +174,7 @@ button:hover {
             document.getElementById("lat").value = e.latlng.lat;
             document.getElementById("lng").value = e.latlng.lng;
 
-            document.getElementById("address").value = "Using coordinates";
+            document.getElementById("address").value = `${e.latlng.lat};${e.latlng.lng}`;
             const { lat, lng } = e.latlng;
 
             // If marker already exists, move it; otherwise create it
@@ -204,6 +204,8 @@ button:hover {
 
         if (date && lat && lng){
             window.location.href = `https://drmy-server-fast.tail8afd19.ts.net/?latitude=${lat}&longitude=${lng}&date=${date}`;
+        } else if (!date){
+            alert("Enter the date!")
         }
     }
 </script>
