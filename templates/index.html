@@ -219,11 +219,9 @@
         console.log(date);
         var lat = document.getElementById("lat").value;
         var lng = document.getElementById("lng").value;
-        var address = document.getElementById("address").value;
 
         if (date && lat && lng){
-            const encodedAddress = encodeURIComponent(address);
-            window.location.href = `https://drmy-server-fast.tail8afd19.ts.net/?latitude=${lat}&longitude=${lng}&date=${date}&location=${encodedAddress}`;
+            window.location.href = `https://drmy-server-fast.tail8afd19.ts.net/?latitude=${lat}&longitude=${lng}&date=${date}`;
         } else if (!date){
             alert("Please, enter the date!")
         } else if (!lat || !lng){
