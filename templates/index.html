@@ -144,7 +144,7 @@
         <div class="input-container">
             <div class="input">
                 <input type="text" id="address" name="address" placeholder="Coordinates">
-                <input type="date" id="date" name="date">
+                <input type="date" id="date" name="date" value="{{ default_date }}">
             </div>
         </div>
         <div class="button-container">
@@ -230,14 +230,6 @@
 </script>
 
 <script>
-    // window.onload = function(){
-    //     const today = new Date();
-    //     const year = today.getFullYear();
-    //     const month = String(today.getMonth() + 1).padStart(2, '0');
-    //     const day = String(today.getDate()).padStart(2, '0');
-    //     document.getElementById("date").value = `${year}-${mont}-${day}`;
-    // }
-
     function submitAddressAndDate(){
         var date = document.getElementById("date").value;
         date = date.replaceAll("-", "");
