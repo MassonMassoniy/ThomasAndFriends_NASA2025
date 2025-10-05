@@ -292,13 +292,6 @@ export default function WeatherMetrics({ data }: { data: WeatherData }) {
         icon={<CloudRain className="size-6 text-gray-800 dark:text-white/90" />}
       /> */}
 
-      <Item
-        title="Air Quality"
-        value={`AQI ${predicted_values.air_quality}/10`}
-        badge={airQualityBadge(predicted_values.air_quality)}
-        icon={<Activity className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
       {/* -------- Probabilities -------- */}
       <div className="col-span-full">
         <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Probabilities</h3>
