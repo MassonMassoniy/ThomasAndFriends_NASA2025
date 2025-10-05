@@ -2,17 +2,18 @@
 
 from flask import Flask, render_template, request
 from Probabilities.nasa_weather_probability import NASAWeatherProbability
+from datetime import date
 
 app = Flask(__name__)
 
 # ------ Pages ------
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', default_date = date.today().isoformat())
 
 
 # ------ APIs ------
-@app.route('/api/getWeather', methods=['GET'])
+@app.route('/getWeather', methods=['GET'])
 def getWeather():
     latitude = request.args.get('latitude', type=float)
     longitude = request.args.get('longitude', type=float)
