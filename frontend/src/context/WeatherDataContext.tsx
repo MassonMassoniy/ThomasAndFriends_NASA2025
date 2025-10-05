@@ -7,7 +7,7 @@ const Ctx = createContext<WeatherData | null>(null);
 export function WeatherDataProvider({
   initial,
   children,
-}: { initial: WeatherData; children: React.ReactNode }) {
+}: { initial: WeatherData | null; children: React.ReactNode }) {
   return <Ctx.Provider value={initial}>{children}</Ctx.Provider>;
 }
 

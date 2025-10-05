@@ -23,7 +23,7 @@ def getWeather():
         end_year = 2024,
     )
 
-    parameters = ['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'RH2M']
+    parameters = ['T2M', 'T2M_MAX', 'T2M_MIN', 'PRECTOTCORR', 'WS2M', 'WD2M', 'RH2M', "T2MWET", "IMERG_PRECLIQUID_PROB", "CLRSKY_SFC_SW_DWN"]
 
     result = estimator.predict_weather_for_date(target_date, parameters, tolerance_days=7)
 
