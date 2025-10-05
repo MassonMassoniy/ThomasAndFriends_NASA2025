@@ -16,6 +16,12 @@ export default function AdminLayout({
 }) {
 
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  const searchParams = useSearchParams();
+  
+  // Get search query parameters
+  const latitude = searchParams.get('latitude') || undefined;
+  const longitude = searchParams.get('longitude') || undefined;
+  const searchDate = searchParams.get('date') || undefined;
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = "ml-0";
@@ -28,7 +34,7 @@ export default function AdminLayout({
         className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
       >
         {/* Header */}
-        <AppHeader />
+        <AppHeader latitude={latitude} longitude={longitude} searchDate={searchDate} />
         {/* Page Content */}
 
             <div className="p-4 mx-auto md:p-6">{children}</div>
