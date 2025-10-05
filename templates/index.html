@@ -44,24 +44,11 @@
         maxZoom: 19,
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
-</script>
 
-<!-- Script to save the date in a variable -->
-<script>
-    const dateInput = document.querySelector('input[type="date"]');
-    let selectedDate = null;
-    dateInput.addEventListener('change', function () {
-        selectedDate = this.value;
-        console.log("Selected date:", selectedDate);
-    });
-</script>
-
-<!-- Script to save coordinates in a variable -->
-<script>
+    // Saving coordinates
     let marker;
     let selectedLatitude = null;
     let selectedLongitude = null;
-
     map.on('click', function(e) {
         const {lat, lng} = e.latlng;
 
@@ -73,6 +60,16 @@
         } else {
             marker = L.marker(e.latlng).addTo(map);
         }
+    });
+</script>
+
+<!-- Script to save the date in a variable -->
+<script>
+    const dateInput = document.querySelector('input[type="date"]');
+    let selectedDate = null;
+    dateInput.addEventListener('change', function () {
+        selectedDate = this.value;
+        console.log("Selected date:", selectedDate);
     });
 </script>
 </html>
