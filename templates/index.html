@@ -28,23 +28,22 @@
 </body>
 
 <!-- Script for map-->
-<script type="module">
+    <script type="module">
+        // import L, { Map, TileLayer, Marker, Circle, Polygon, Popup } from 'leaflet';
 
     var map = L.map('map').setView([51.505, -0.09], 13);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
 
-    function onMapClick(e) {
-        console.log(e.latlng);
-        document.getElementById("lat").value = e.latlng.lat;
-        document.getElementById("lng").value = e.latlng.lng;
+        function onMapClick(e) {
+            console.log(e.latlng);
 
-        document.getElementById("address").value = "Using coordinates";
-
-    }
+            document.getElementById("address").value = "Using coordinates";
+            
+        }
 
     map.on('click', onMapClick);
 </script>
