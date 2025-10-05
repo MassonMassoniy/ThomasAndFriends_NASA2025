@@ -11,7 +11,7 @@ body {
     color: #000000;
 }
 
-.body-container{
+.body-container {
     height: 100%;
     width: 100%;
 }
@@ -37,7 +37,7 @@ body {
     margin: 0 auto
 }
 
-.button-container{
+.button-container {
     display: flex;
     margin-top: -10%;
 }
