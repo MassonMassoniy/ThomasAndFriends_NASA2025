@@ -40,9 +40,39 @@
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
-        
-        L.Control.geocoder().addTo(map);
+
         let marker = null;
+        let selectedLatitude = null;
+        let selectedLongitude = null;
+
+        // Geocoder control
+        var geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            const latlng = e.geocode.center;
+            selectedLatitude = latlng.lat;
+            selectedLongitude = latlng.lng;
+            console.log(latlng);
+
+            // Update hidden inputs
+            document.getElementById("lat").value = selectedLatitude;
+            document.getElementById("lng").value = selectedLongitude;
+
+            // Update visible input
+            document.getElementById("address").value = e.geocode.name;
+
+            // Drop or move marker
+            if (marker) {
+                marker.setLatLng(latlng);
+            } else {
+                marker = L.marker(latlng).addTo(map);
+            }
+
+            // Center map
+            map.setView(latlng, 13);
+        })
+        .addTo(map);
 
         function onMapClick(e) {
             console.log(e.latlng);
@@ -64,9 +94,6 @@
             let selectedLongitude;
             selectedLatitude = lat;
             selectedLongitude = lng;
-
-            // Update the address field (you can replace with reverse geocoding later)
-            document.getElementById("address").value = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
         }
 
     map.on('click', onMapClick);
