@@ -205,3 +205,7 @@ from nasa_weather_probability import NASAWeatherProbability
 estimator = NASAWeatherProbability(longitude=-97.1384, latitude=30.2672)
 results = estimator.predict_weather_for_date("07/15")
 ```
+
+### Template used
+[GitHub](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
+![image](https://raw.githubusercontent.com/TailAdmin/free-nextjs-admin-dashboard/refs/heads/main/banner.png)
