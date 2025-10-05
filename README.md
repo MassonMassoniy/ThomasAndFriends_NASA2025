@@ -24,6 +24,8 @@
 - api-parameters: https://power.larc.nasa.gov/parameters/
 - docs: https://power.larc.nasa.gov/docs/services/api/temporal/daily/
 
+## Canva Presentation:
+- [text](https://www.canva.com/design/DAG07649bCo/uYBFvDCEiXo7r2IP67uzpQ/edit?utm_content=DAG07649bCo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## 🧠 Use of Artificial Intelligence (AI):
 
