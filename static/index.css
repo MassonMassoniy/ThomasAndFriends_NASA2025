@@ -32,10 +32,10 @@ body {
 }
 
 .map-container{
-    position: fixed;
-    height: 30%;
+    position: relative;
+    height: 40%;
     width: 40%;
-    margin-left: 30%;
+    margin: 0 auto
 }
 
 .button-container{

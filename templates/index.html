@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <title>Will it rain on my parade?</title>
 </head>
+
 <body>
     <h1 class="heading"><strong>Please select location and date:</strong></h1>
     <div class="body-container">
-        <div class="map-container" id="map"></div>
+        <div style="width: 600px; height: 400px; position: relative;" class="map-container leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" id="map"></div>
         <div class="input-container">
             <div class="input">
                 <input type="text" id="address" name="address" placeholder="Enter the full address">
@@ -25,26 +25,29 @@
             <button type="submit"><strong>Will it rain on my parade?</strong></button>
         </div>
     </div>
+    <!-- Script for map-->
+    <script type="module">
+        // import L, { Map, TileLayer, Marker, Circle, Polygon, Popup } from 'leaflet';
+
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+
+        map.on('click', onMapClick);
+    </script>
 </body>
 
-<!-- Script for map-->
-<script type="importmap">
-    {
-        "imports": {
-            "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js"
-        }
-    }
-</script>
-<script type="module">
-    import L, {Map, TileLayer, Marker, Circle, Polygon, Popup} from 'leaflet';
 
-    const map = new Map('map').setView([51.505, -0.09], 13);
-
-    const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-</script>
 
 <!-- Script to save the date in a variable -->
 <script>
