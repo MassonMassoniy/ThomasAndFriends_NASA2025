@@ -143,7 +143,7 @@
 <!-- Script for map-->
 <script type="module">
 
-    var map = L.map('map').setView([51.505, -0.09], 13);
+    var map = L.map('map').setView([49.8955367, -97.1384584], 13);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
@@ -227,15 +227,5 @@
             alert("Enter the date!")
         }
     }
-</script>
-
-<!-- Script to save the date in a variable -->
-<script>
-    const dateInput = document.querySelector('input[type="date"]');
-    let selectedDate = null;
-    dateInput.addEventListener('change', function () {
-        selectedDate = this.value;
-        console.log("Selected date:", selectedDate);
-    });
 </script>
 </html>
