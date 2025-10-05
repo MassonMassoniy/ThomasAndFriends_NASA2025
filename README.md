@@ -206,6 +206,18 @@ estimator = NASAWeatherProbability(longitude=-97.1384, latitude=30.2672)
 results = estimator.predict_weather_for_date("07/15")
 ```
 
-### Template used
-[GitHub](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
+### Resources used
+- [CSS Templat](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
 ![image](https://raw.githubusercontent.com/TailAdmin/free-nextjs-admin-dashboard/refs/heads/main/banner.png)
+- Icons and Images:
+  - [Rain icon](https://www.svgrepo.com)
+  - [NASA icon](https://www.spaceappschallenge.org/about/)
+  - [team collaboration image](https://nboldapp.com/wp-content/uploads/2021/04/Elements-Business-09-1024x875.jpg)
+  - [UofM icon](https://umanitoba.ca/)
+  - [Icons used in presentation](https://icons8.com/icons)
+  - AI Images:
+    - [ChatGPT](https://chatgpt.com/)
+    - [Canva](https://www.canva.com/)
+- AI Tools:
+  - [Cursor](https://cursor.com/)
+  - [ChatGPT](https://chatgpt.com/)

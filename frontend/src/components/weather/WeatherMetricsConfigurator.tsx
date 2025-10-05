@@ -50,9 +50,22 @@ export type CardKey =
 
 /** Small helpers */
 const pct = (n: number) => `${n.toFixed(1)}%`;
-const mm = (n: number) => `${n.toFixed(2)} mm`;
-const ms = (n: number) => `${n.toFixed(1)} m/s`;
-const celsius = (n: number) => `${n.toFixed(1)}°C`;
+const mm = (n: number, moe?: number) => 
+  moe !== undefined ? (
+    <>{n.toFixed(2)} mm<span className="text-xs opacity-70">±{moe.toFixed(2)}</span></>
+  ) : `${n.toFixed(2)} mm`;
+const ms = (n: number, moe?: number) => 
+  moe !== undefined ? (
+    <>{n.toFixed(1)} m/s<span className="text-xs opacity-70">±{moe.toFixed(2)}</span></>
+  ) : `${n.toFixed(1)} m/s`;
+const celsius = (n: number, moe?: number) => 
+  moe !== undefined ? (
+    <>{n.toFixed(1)}°C<span className="text-xs opacity-70">±{moe.toFixed(2)}</span></>
+  ) : `${n.toFixed(1)}°C`;
+const humidity = (n: number, moe?: number) => 
+  moe !== undefined ? (
+    <>{n.toFixed(0)}%<span className="text-xs opacity-70">±{moe.toFixed(1)}</span></>
+  ) : `${n.toFixed(0)}%`;
 
 function degreesToCardinal(degrees: number): string {
   const directions = [
@@ -162,16 +175,16 @@ function WindDirectionVane({ degrees }: { degrees: number | undefined }) {
 function Item({ title, value, sub, badge = null, icon }: { title: string; value: React.ReactNode; sub?: React.ReactNode; badge?: React.ReactNode; icon?: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-      <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-        {icon ?? <Info className="size-6 text-gray-800 dark:text-white/90" />}
-      </div>
-      <div className="mt-5 flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <span className="text-sm text-gray-500 dark:text-gray-400">{title}</span>
-          <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90 truncate">{value}</h4>
-          {sub && <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{sub}</div>}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800 flex-shrink-0">
+          {icon ?? <Info className="size-6 text-gray-800 dark:text-white/90" />}
         </div>
-        {badge ?? <div />}
+        {badge && <div className="flex-shrink-0">{badge}</div>}
+      </div>
+      <div className="mt-5">
+        <span className="text-sm text-gray-500 dark:text-gray-400">{title}</span>
+        <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{value}</h4>
+        {sub && <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{sub}</div>}
       </div>
     </div>
   );
@@ -179,14 +192,17 @@ function Item({ title, value, sub, badge = null, icon }: { title: string; value:
 
 /** ---------------- WeatherMetrics (now accepts `visible`) ---------------- */
 export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?: Partial<Record<CardKey, boolean>> }) {
-  const { probabilities, predicted_values, confidence } = data;
+  const { probabilities, predicted_values, confidence, uncertainty } = data;
   const show = (key: CardKey, fallback = true) => (visible?.[key] ?? fallback);
 
   return (
     <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
       {(show("airTemp") || show("dailyMax") || show("dailyMin") || show("precip") || show("windSpeed") || show("windDir") || show("humidity") || show("feeling") || show("airQuality")) && (
         <div className="col-span-full mt-3">
-          <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Predicted Values</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Predicted Values</h3>
+            <span className="text-xs text-gray-400 dark:text-gray-500">95% Confidence Interval</span>
+          </div>
         </div>
       )}
 
@@ -203,9 +219,9 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       {show("airTemp") && (
         <Item
           title="Air Temp"
-          value={celsius(predicted_values.T2M)}
+          value={celsius(predicted_values.T2M, uncertainty.predicted_values.T2M.margin_of_error)}
           sub="Current-day mean"
-          badge={<Badge variant="light" color={confidenceColor(confidence.T2M)}>Confidence: {confidence.T2M}</Badge>}
+          badge={<Badge variant="light" color={confidenceColor(confidence.T2M)}>{confidence.T2M}</Badge>}
           icon={<ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />}
         />
       )}
@@ -213,8 +229,8 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       {show("dailyMax") && (
         <Item
           title="Daily Max"
-          value={celsius(predicted_values.T2M_MAX)}
-          badge={<Badge variant="light" color={confidenceColor(confidence.T2M_MAX)}>Confidence: {confidence.T2M_MAX}</Badge>}
+          value={celsius(predicted_values.T2M_MAX, uncertainty.predicted_values.T2M_MAX.margin_of_error)}
+          badge={<Badge variant="light" color={confidenceColor(confidence.T2M_MAX)}>{confidence.T2M_MAX}</Badge>}
           icon={<Sun className="size-6 text-gray-800 dark:text-white/90" />}
         />
       )}
@@ -222,8 +238,8 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       {show("dailyMin") && (
         <Item
           title="Daily Min"
-          value={celsius(predicted_values.T2M_MIN)}
-          badge={<Badge variant="light" color="info">Nighttime Low</Badge>}
+          value={celsius(predicted_values.T2M_MIN, uncertainty.predicted_values.T2M_MIN.margin_of_error)}
+          badge={<Badge variant="light" color={confidenceColor(confidence.T2M_MIN)}>{confidence.T2M_MIN}</Badge>}
           icon={<Cloud className="size-6 text-gray-800 dark:text-white/90" />}
         />
       )}
@@ -231,9 +247,9 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       {show("precip") && (
         <Item
           title="Precipitation"
-          value={mm(predicted_values.PRECTOTCORR)}
+          value={mm(predicted_values.PRECTOTCORR, uncertainty.predicted_values.PRECTOTCORR.margin_of_error)}
           sub={predicted_values.PRECTOTCORR >= 10 ? "Heavy rain risk" : predicted_values.PRECTOTCORR >= 1 ? "Light to moderate" : "Minimal"}
-          badge={<Badge variant="light" color={confidenceColor(confidence.PRECTOTCORR)}>Confidence: {confidence.PRECTOTCORR}</Badge>}
+          badge={<Badge variant="light" color={confidenceColor(confidence.PRECTOTCORR)}>{confidence.PRECTOTCORR}</Badge>}
           icon={<CloudSunRain className="size-6 text-gray-800 dark:text-white/90" />}
         />
       )}
@@ -241,9 +257,9 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       {show("windSpeed") && (
         <Item
           title="Wind Speed"
-          value={ms(predicted_values.WS2M)}
+          value={ms(predicted_values.WS2M, uncertainty.predicted_values.WS2M.margin_of_error)}
           sub={predicted_values.WS2M >= 10 ? "Strong" : predicted_values.WS2M >= 5 ? "Breezy" : "Calm"}
-          badge={<Badge variant="light" color={confidenceColor(confidence.WS2M)}>Confidence: {confidence.WS2M}</Badge>}
+          badge={<Badge variant="light" color={confidenceColor(confidence.WS2M)}>{confidence.WS2M}</Badge>}
           icon={<Wind className="size-6 text-gray-800 dark:text-white/90" />}
         />
       )}
@@ -263,9 +279,9 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       {show("humidity") && (
         <Item
           title="Relative Humidity"
-          value={`${predicted_values.RH2M.toFixed(0)}%`}
+          value={humidity(predicted_values.RH2M, uncertainty.predicted_values.RH2M.margin_of_error)}
           sub={predicted_values.RH2M >= 80 ? "Muggy" : predicted_values.RH2M <= 30 ? "Dry" : "Comfortable"}
-          badge={<Badge variant="light" color={confidenceColor(confidence.RH2M)}>Confidence: {confidence.RH2M}</Badge>}
+          badge={<Badge variant="light" color={confidenceColor(confidence.RH2M)}>{confidence.RH2M}</Badge>}
           icon={<Droplets className="size-6 text-gray-800 dark:text-white/90" />}
         />
       )}
@@ -286,80 +302,90 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
 
       {show("probVeryHot") && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-            <ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />
-          </div>
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <div className="min-w-0 w-full">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Very Hot (&gt;35°C)</span>
-              <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_hot)}</h4>
-              <Progress value={data.probabilities.very_hot} />
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800 flex-shrink-0">
+              <ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />
             </div>
-            <Badge variant="light" color={data.probabilities.very_hot >= 60 ? "warning" : "info"}>Risk</Badge>
+            <div className="flex-shrink-0">
+              <Badge variant="light" color={data.probabilities.very_hot >= 60 ? "warning" : "info"}>Risk</Badge>
+            </div>
+          </div>
+          <div className="mt-5">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Very Hot (&gt;35°C)</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_hot)}</h4>
+            <Progress value={data.probabilities.very_hot} />
           </div>
         </div>
       )}
 
       {show("probVeryCold") && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-            <ThermometerSnowflake className="size-6 text-gray-800 dark:text-white/90" />
-          </div>
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <div className="min-w-0 w-full">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Very Cold (&lt;-10°C)</span>
-              <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_cold)}</h4>
-              <Progress value={data.probabilities.very_cold} />
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800 flex-shrink-0">
+              <ThermometerSnowflake className="size-6 text-gray-800 dark:text-white/90" />
             </div>
-            <Badge variant="light" color={data.probabilities.very_cold >= 60 ? "warning" : "info"}>Risk</Badge>
+            <div className="flex-shrink-0">
+              <Badge variant="light" color={data.probabilities.very_cold >= 60 ? "warning" : "info"}>Risk</Badge>
+            </div>
+          </div>
+          <div className="mt-5">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Very Cold (&lt;-10°C)</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_cold)}</h4>
+            <Progress value={data.probabilities.very_cold} />
           </div>
         </div>
       )}
 
       {show("probVeryWindy") && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-            <Wind className="size-6 text-gray-800 dark:text-white/90" />
-          </div>
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <div className="min-w-0 w-full">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Very Windy (&gt;10 m/s)</span>
-              <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_windy)}</h4>
-              <Progress value={data.probabilities.very_windy} />
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800 flex-shrink-0">
+              <Wind className="size-6 text-gray-800 dark:text-white/90" />
             </div>
-            <Badge variant="light" color={data.probabilities.very_windy >= 60 ? "warning" : "info"}>Risk</Badge>
+            <div className="flex-shrink-0">
+              <Badge variant="light" color={data.probabilities.very_windy >= 60 ? "warning" : "info"}>Risk</Badge>
+            </div>
+          </div>
+          <div className="mt-5">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Very Windy (&gt;10 m/s)</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_windy)}</h4>
+            <Progress value={data.probabilities.very_windy} />
           </div>
         </div>
       )}
 
       {show("probVeryWet") && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-            <CloudRain className="size-6 text-gray-800 dark:text-white/90" />
-          </div>
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <div className="min-w-0 w-full">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Very Wet (&gt;10 mm/day)</span>
-              <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_wet)}</h4>
-              <Progress value={data.probabilities.very_wet} />
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800 flex-shrink-0">
+              <CloudRain className="size-6 text-gray-800 dark:text-white/90" />
             </div>
-            <Badge variant="light" color={data.probabilities.very_wet >= 60 ? "warning" : "info"}>Risk</Badge>
+            <div className="flex-shrink-0">
+              <Badge variant="light" color={data.probabilities.very_wet >= 60 ? "warning" : "info"}>Risk</Badge>
+            </div>
+          </div>
+          <div className="mt-5">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Very Wet (&gt;10 mm/day)</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_wet)}</h4>
+            <Progress value={data.probabilities.very_wet} />
           </div>
         </div>
       )}
 
       {show("probVeryUncomfortable") && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-          <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
-            <Droplets className="size-6 text-gray-800 dark:text-white/90" />
-          </div>
-          <div className="mt-5 flex items-end justify-between gap-3">
-            <div className="min-w-0 w-full">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Very Uncomfortable Humidity (&gt;80%)</span>
-              <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_uncomfortable)}</h4>
-              <Progress value={data.probabilities.very_uncomfortable} />
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800 flex-shrink-0">
+              <Droplets className="size-6 text-gray-800 dark:text-white/90" />
             </div>
-            <Badge variant="light" color={data.probabilities.very_uncomfortable >= 40 ? "warning" : "info"}>Risk</Badge>
+            <div className="flex-shrink-0">
+              <Badge variant="light" color={data.probabilities.very_uncomfortable >= 40 ? "warning" : "info"}>Risk</Badge>
+            </div>
+          </div>
+          <div className="mt-5">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Very Uncomfortable Humidity (&gt;80%)</span>
+            <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">{pct(data.probabilities.very_uncomfortable)}</h4>
+            <Progress value={data.probabilities.very_uncomfortable} />
           </div>
         </div>
       )}
