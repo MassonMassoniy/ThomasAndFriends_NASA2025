@@ -22,14 +22,15 @@
             </div>
         </div>
         <div class="button-container">
-            <button type="submit" onclick="submitAddressAndDate"><strong>Will it rain on my parade?</strong></button>
+            <button type="submit" onclick="submitAddressAndDate()"><strong>Will it rain on my parade?</strong></button>
         </div>
     </div>
+    <div id="lat"></div>
+    <div id="lng"
 </body>
 
 <!-- Script for map-->
-    <script type="module">
-        // import L, { Map, TileLayer, Marker, Circle, Polygon, Popup } from 'leaflet';
+<script type="module">
 
     var map = L.map('map').setView([51.505, -0.09], 13);
 
@@ -42,6 +43,8 @@
 
         function onMapClick(e) {
             console.log(e.latlng);
+            document.getElementById("lat").value = e.latlng.lat;
+            document.getElementById("lng").value = e.latlng.lng;
 
             document.getElementById("address").value = "Using coordinates";
             const { lat, lng } = e.latlng;
@@ -68,7 +71,8 @@
 
 <script>
     function submitAddressAndDate(){
-        var date = getElementById("date").value;
+        var date = document.getElementById("date").value;
+        date = date.replaceAll("-", "");
         console.log(date);
         var lat = document.getElementById("lat").value;
         var lng = document.getElementById("lng").value;
