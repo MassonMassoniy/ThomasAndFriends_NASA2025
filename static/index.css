@@ -34,6 +34,10 @@ body {
     position: relative;
     height: 40%;
     width: 40%;
+    border-style: solid;
+    border-radius: 20px;
+    border-width: 5px;
+    border-color: #6283ff;
     margin: 0 auto
 }
 
