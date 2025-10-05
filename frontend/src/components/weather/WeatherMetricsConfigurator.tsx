@@ -117,8 +117,9 @@ function feelingBadge(feeling: string) {
 }
 
 function airQualityBadge(index: WeatherData["predicted_values"]["air_quality"]) {
-  const label = index >= 9 ? "Excellent" : index >= 8 ? "Good" : index >= 7 ? "Fair" : index >= 5 ? "Moderate" : "Poor";
-  const color: Parameters<typeof Badge>[0]["color"] = index >= 9 ? "success" : index >= 8 ? "success" : index >= 7 ? "info" : index >= 5 ? "warning" : "error";
+  // Standard AQI (1–10): 1 is good, 10 is poor
+  const label = index <= 2 ? "Good" : index <= 4 ? "Fair" : index <= 6 ? "Moderate" : index <= 8 ? "Poor" : "Very Poor";
+  const color: Parameters<typeof Badge>[0]["color"] = index <= 2 ? "success" : index <= 4 ? "info" : index <= 6 ? "warning" : "error";
   return (
     <div className="flex items-center gap-2">
       <Badge variant="solid" color={color}>{label}</Badge>
@@ -291,7 +292,13 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
       )}
 
       {show("airQuality") && (
-        <Item title="Air Quality" value={`AQI ${data.predicted_values.air_quality}/10`} badge={airQualityBadge(data.predicted_values.air_quality)} icon={<Activity className="size-6 text-gray-800 dark:text-white/90" />} />
+        <Item 
+          title="Air Quality Index" 
+          value={`${data.predicted_values.air_quality}/10`} 
+          sub="1 = Good, 10 = Poor"
+          badge={airQualityBadge(data.predicted_values.air_quality)} 
+          icon={<Activity className="size-6 text-gray-800 dark:text-white/90" />} 
+        />
       )}
 
       {(show("probVeryHot") || show("probVeryCold") || show("probVeryWindy") || show("probVeryWet") || show("probVeryUncomfortable")) && (
@@ -543,7 +550,7 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
       }
       
       if (selected.includes("airQuality")) {
-        csvRows.push(`Air Quality Index,${predicted_values.air_quality},/10,-,-,-,-`);
+        csvRows.push(`Air Quality Index,${predicted_values.air_quality},/10 (1=Good 10=Poor),-,-,-,-`);
       }
 
       if (selected.includes("T2M_trend")) {
