@@ -1,5 +1,8 @@
 # Probabilities - Weather Probability Estimator
 
+## Canva Presentation:
+- **[Link](https://www.canva.com/design/DAG07649bCo/uYBFvDCEiXo7r2IP67uzpQ/edit?utm_content=DAG07649bCo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)**
+
 ## Input:
 - **Location**: {longitude: float value, latitude: float value}
 - **Date format**: String "YYYY/MM/DD", "MM/DD", or "YYYYMMDD"
@@ -23,9 +26,6 @@
 - api-request: NASA Power https://power.larc.nasa.gov/docs/services/api/temporal/daily/
 - api-parameters: https://power.larc.nasa.gov/parameters/
 - docs: https://power.larc.nasa.gov/docs/services/api/temporal/daily/
-
-## Canva Presentation:
-- [text](https://www.canva.com/design/DAG07649bCo/uYBFvDCEiXo7r2IP67uzpQ/edit?utm_content=DAG07649bCo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## 🧠 Use of Artificial Intelligence (AI):
 
