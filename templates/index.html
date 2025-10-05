@@ -214,6 +214,14 @@
 </script>
 
 <script>
+    // window.onload = function(){
+    //     const today = new Date();
+    //     const year = today.getFullYear();
+    //     const month = String(today.getMonth() + 1).padStart(2, '0');
+    //     const day = String(today.getDate()).padStart(2, '0');
+    //     document.getElementById("date").value = `${year}-${mont}-${day}`;
+    // }
+
     function submitAddressAndDate(){
         var date = document.getElementById("date").value;
         date = date.replaceAll("-", "");
