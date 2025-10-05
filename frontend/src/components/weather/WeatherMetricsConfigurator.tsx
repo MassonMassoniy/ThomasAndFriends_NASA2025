@@ -610,8 +610,8 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
             <Download className="size-4" />
             <span>Export CSV ({selected.length})</span>
           </button>
-          <button onClick={selectAll} className="px-3 py-1.5 text-sm rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Select all</button>
-          <button onClick={selectNone} className="px-3 py-1.5 text-sm rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Clear</button>
+          <button onClick={selectAll} className="px-3 py-1.5 text-sm text-black rounded-xl dark:text-white bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Select all</button>
+          <button onClick={selectNone} className="px-3 py-1.5 text-sm text-black rounded-xl dark:text-white bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Clear</button>
         </div>
       </div>
 

@@ -86,9 +86,6 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.04);
             transition: background 0.2s;
         }
-        button:hover {
-            background: #e5e5e5;
-        }
         @media (max-width: 800px) {
             .main-card {
                 max-width: 98vw;
@@ -103,6 +100,22 @@
                 gap: 1rem;
             }
         }
+        .leaflet-control-geocoder-icon { /* Mangifying glass icon */
+            margin: auto;
+            position: relative;
+        }
+
+        .leaflet-bar{
+            display: flex;
+            align-items: center;
+            display: grid;
+            align-content: center;
+            grid-template-columns: auto auto;
+        }
+        .leaflet-control-geocoder-alternatives{
+            grid-column-start: 2;
+        }
+
     </style>
 </head>
 <body>
@@ -140,9 +153,17 @@
 
         // Geocoder control
         var geocoder = L.Control.geocoder({
+            geocoder: new L.Control.Geocoder.Photon(),
             defaultMarkGeocode: false,
-            collapsed: false,
+<<<<<<< Updated upstream
+            collapsed: true,
             position: "topright"
+=======
+            collapsed: false,
+            position: "topright",
+            suggestMinLength: 1,     // live after 1 char
+            suggestTimeout: 200  
+>>>>>>> Stashed changes
         })
         .on('markgeocode', function(e) {
             const latlng = e.geocode.center;
