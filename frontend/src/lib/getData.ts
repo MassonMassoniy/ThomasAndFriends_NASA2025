@@ -25,7 +25,7 @@ export type ParamKey = z.infer<typeof ParamKey>;
 export const Confidence = z.enum(["low", "medium", "high"]);
 export type Confidence = z.infer<typeof Confidence>;
 
-export const Feeling = z.enum(["Hot", "Cold"]);
+export const Feeling = z.enum(["Hot", "Cold", "Warm"]);
 export type Feeling = z.infer<typeof Feeling>;
 
 /** helpers */

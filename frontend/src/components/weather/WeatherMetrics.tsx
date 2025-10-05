@@ -17,36 +17,37 @@ import {
   Activity,
   Info,
 } from "lucide-react";
+import { WeatherData } from "@/lib/getData";
 
 /** ---------------- Types (match your JSON) ---------------- */
-type WeatherData = {
-  probabilities: {
-    very_hot: number;
-    very_cold: number;
-    very_windy: number;
-    very_wet: number;
-    very_uncomfortable: number;
-  };
-  predicted_values: {
-    T2M: number;
-    T2M_MAX: number;
-    T2M_MIN: number;
-    PRECTOTCORR: number;
-    WS2M: number;
-    WD2M?: number;
-    RH2M: number;
-    feeling: "Hot" | "Cold" | string;
-    precipitation: boolean;
-    air_quality: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-  };
-  confidence: {
-    T2M: "low" | "medium" | "high";
-    T2M_MAX: "low" | "medium" | "high";
-    PRECTOTCORR: "low" | "medium" | "high";
-    WS2M: "low" | "medium" | "high";
-    RH2M: "low" | "medium" | "high";
-  };
-};
+// type WeatherData = {
+//   probabilities: {
+//     very_hot: number;
+//     very_cold: number;
+//     very_windy: number;
+//     very_wet: number;
+//     very_uncomfortable: number;
+//   };
+//   predicted_values: {
+//     T2M: number;
+//     T2M_MAX: number;
+//     T2M_MIN: number;
+//     PRECTOTCORR: number;
+//     WS2M: number;
+//     WD2M?: number;
+//     RH2M: number;
+//     feeling: "Hot" | "Cold" | string;
+//     precipitation: boolean;
+//     air_quality: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+//   };
+//   confidence: {
+//     T2M: "low" | "medium" | "high";
+//     T2M_MAX: "low" | "medium" | "high";
+//     PRECTOTCORR: "low" | "medium" | "high";
+//     WS2M: "low" | "medium" | "high";
+//     RH2M: "low" | "medium" | "high";
+//   };
+// };
 
 /** ---------------- Small helpers ---------------- */
 const pct = (n: number) => `${n.toFixed(1)}%`;
