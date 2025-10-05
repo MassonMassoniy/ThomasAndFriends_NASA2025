@@ -153,9 +153,17 @@
 
         // Geocoder control
         var geocoder = L.Control.geocoder({
+            geocoder: new L.Control.Geocoder.Photon(),
             defaultMarkGeocode: false,
+<<<<<<< Updated upstream
             collapsed: true,
             position: "topright"
+=======
+            collapsed: false,
+            position: "topright",
+            suggestMinLength: 1,     // live after 1 char
+            suggestTimeout: 200  
+>>>>>>> Stashed changes
         })
         .on('markgeocode', function(e) {
             const latlng = e.geocode.center;
