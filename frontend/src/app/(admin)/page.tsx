@@ -44,7 +44,7 @@ const exampleData = {
 } as const;
 
 export default function Ecommerce() {
-  //const data = useWeatherData();
+  const data = useWeatherData();
   return (
     <div>
       {/* <div className="col-span-11 space-y-6 xl:col-span-9"> */}
