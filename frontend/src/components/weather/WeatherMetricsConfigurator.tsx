@@ -16,6 +16,7 @@ import {
   Activity,
   Info,
   Settings as SettingsIcon,
+  Download,
 } from "lucide-react";
 import Badge from "@/components/ui/badge/Badge";
 import { WeatherData } from "@/lib/getData";
@@ -44,7 +45,8 @@ export type CardKey =
   | "probVeryCold"
   | "probVeryWindy"
   | "probVeryWet"
-  | "probVeryUncomfortable";
+  | "probVeryUncomfortable"
+  | "T2M_trend"; // <-- Added
 
 /** Small helpers */
 const pct = (n: number) => `${n.toFixed(1)}%`;
@@ -186,6 +188,16 @@ export function WeatherMetrics({ data, visible }: { data: WeatherData; visible?:
         <div className="col-span-full mt-3">
           <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Predicted Values</h3>
         </div>
+      )}
+
+      {show("T2M_trend") && data.predicted_values.T2M_trend !== undefined && (
+        <Item
+          title="Air Temp Trend"
+          value={celsius(data.predicted_values.T2M_trend)}
+          sub="Weighted recent mean + annual rate"
+          badge={<Badge variant="light" color="info">Trend</Badge>}
+          icon={<ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />}
+        />
       )}
 
       {show("airTemp") && (
@@ -371,6 +383,7 @@ const ALL_KEYS: CardKey[] = [
   "probVeryWindy",
   "probVeryWet",
   "probVeryUncomfortable",
+  "T2M_trend", // <-- Added
 ];
 
 const LABELS: Record<CardKey, string> = {
@@ -388,6 +401,7 @@ const LABELS: Record<CardKey, string> = {
   probVeryWindy: "Prob. Very Windy",
   probVeryWet: "Prob. Very Wet",
   probVeryUncomfortable: "Prob. Very Uncomfortable",
+  T2M_trend: "Air Temp Trend", // <-- Added
 };
 
 const STORAGE_KEY = "weather.visibleCards.v1";
@@ -435,6 +449,147 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
     setSelected([]);
   }
 
+  function exportToCSV() {
+    if (!data) {
+      console.error("No weather data available");
+      return;
+    }
+
+    const { predicted_values, confidence, probabilities, metadata } = data;
+    const csvRows: string[] = [];
+
+    // ===== HEADER SECTION =====
+    csvRows.push("WEATHER DATA EXPORT");
+    csvRows.push(`Export Date:,${new Date().toLocaleString()}`);
+    csvRows.push(`Location:,"Latitude ${metadata.location.latitude}° / Longitude ${metadata.location.longitude}°"`);
+    csvRows.push("");
+    csvRows.push("");
+
+    // ===== PREDICTED VALUES SECTION =====
+    const hasPredictedValues = selected.some(k => 
+      ["airTemp", "dailyMax", "dailyMin", "precip", "windSpeed", "windDir", "humidity", "feeling", "airQuality"].includes(k)
+    );
+
+    if (hasPredictedValues) {
+      csvRows.push("PREDICTED VALUES");
+      csvRows.push("Parameter,Value,Unit,Confidence Level,Margin of Error,Confidence Interval,Data Points");
+      
+      if (selected.includes("airTemp")) {
+        csvRows.push(`Air Temperature (T2M),${predicted_values.T2M.toFixed(2)},°C,${confidence.T2M},±${data.uncertainty.predicted_values.T2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.T2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.T2M}`);
+      }
+      
+      if (selected.includes("dailyMax")) {
+        csvRows.push(`Daily Max Temperature,${predicted_values.T2M_MAX.toFixed(2)},°C,${confidence.T2M_MAX},±${data.uncertainty.predicted_values.T2M_MAX.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.T2M_MAX.confidence_interval_width.toFixed(2)},${metadata.data_points_used.T2M_MAX}`);
+      }
+      
+      if (selected.includes("dailyMin")) {
+        csvRows.push(`Daily Min Temperature,${predicted_values.T2M_MIN.toFixed(2)},°C,${confidence.T2M_MIN},±${data.uncertainty.predicted_values.T2M_MIN.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.T2M_MIN.confidence_interval_width.toFixed(2)},${metadata.data_points_used.T2M_MIN}`);
+      }
+      
+      if (selected.includes("precip")) {
+        csvRows.push(`Precipitation (Total),${predicted_values.PRECTOTCORR.toFixed(2)},mm,${confidence.PRECTOTCORR},±${data.uncertainty.predicted_values.PRECTOTCORR.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.PRECTOTCORR.confidence_interval_width.toFixed(2)},${metadata.data_points_used.PRECTOTCORR}`);
+      }
+      
+      if (selected.includes("windSpeed")) {
+        csvRows.push(`Wind Speed,${predicted_values.WS2M.toFixed(2)},m/s,${confidence.WS2M},±${data.uncertainty.predicted_values.WS2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.WS2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.WS2M}`);
+      }
+      
+      if (selected.includes("windDir")) {
+        csvRows.push(`Wind Direction,${predicted_values.WD2M.toFixed(0)},degrees,${confidence.WD2M},±${data.uncertainty.predicted_values.WD2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.WD2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.WD2M}`);
+      }
+      
+      if (selected.includes("humidity")) {
+        csvRows.push(`Relative Humidity,${predicted_values.RH2M.toFixed(1)},%,${confidence.RH2M},±${data.uncertainty.predicted_values.RH2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.RH2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.RH2M}`);
+      }
+      
+      if (selected.includes("feeling")) {
+        csvRows.push(`Thermal Feeling,${predicted_values.feeling},-,-,-,-,-`);
+      }
+      
+      if (selected.includes("airQuality")) {
+        csvRows.push(`Air Quality Index,${predicted_values.air_quality},/10,-,-,-,-`);
+      }
+      
+      csvRows.push("");
+      csvRows.push("");
+    }
+
+    // ===== PROBABILITY ANALYSIS SECTION =====
+    const hasProbabilities = selected.some(k => 
+      ["probVeryHot", "probVeryCold", "probVeryWindy", "probVeryWet", "probVeryUncomfortable"].includes(k)
+    );
+
+    if (hasProbabilities) {
+      csvRows.push("PROBABILITY ANALYSIS");
+      csvRows.push("Condition,Probability (%),Risk Level,Description");
+      
+      if (selected.includes("probVeryHot")) {
+        const riskLevel = probabilities.very_hot >= 60 ? "HIGH" : probabilities.very_hot >= 30 ? "MODERATE" : "LOW";
+        csvRows.push(`Very Hot Conditions,${probabilities.very_hot.toFixed(1)},${riskLevel},Temperature exceeds 35°C`);
+      }
+      
+      if (selected.includes("probVeryCold")) {
+        const riskLevel = probabilities.very_cold >= 60 ? "HIGH" : probabilities.very_cold >= 30 ? "MODERATE" : "LOW";
+        csvRows.push(`Very Cold Conditions,${probabilities.very_cold.toFixed(1)},${riskLevel},Temperature below -10°C`);
+      }
+      
+      if (selected.includes("probVeryWindy")) {
+        const riskLevel = probabilities.very_windy >= 60 ? "HIGH" : probabilities.very_windy >= 30 ? "MODERATE" : "LOW";
+        csvRows.push(`Very Windy Conditions,${probabilities.very_windy.toFixed(1)},${riskLevel},Wind speed exceeds 10 m/s`);
+      }
+      
+      if (selected.includes("probVeryWet")) {
+        const riskLevel = probabilities.very_wet >= 60 ? "HIGH" : probabilities.very_wet >= 30 ? "MODERATE" : "LOW";
+        csvRows.push(`Very Wet Conditions,${probabilities.very_wet.toFixed(1)},${riskLevel},Precipitation exceeds 10 mm/day`);
+      }
+      
+      if (selected.includes("probVeryUncomfortable")) {
+        const riskLevel = probabilities.very_uncomfortable >= 40 ? "HIGH" : probabilities.very_uncomfortable >= 20 ? "MODERATE" : "LOW";
+        csvRows.push(`Very Uncomfortable Humidity,${probabilities.very_uncomfortable.toFixed(1)},${riskLevel},Humidity exceeds 80%`);
+      }
+      
+      csvRows.push("");
+      csvRows.push("");
+    }
+
+    // ===== ADDITIONAL PARAMETERS SECTION =====
+    csvRows.push("ADDITIONAL PARAMETERS");
+    csvRows.push("Parameter,Value,Unit,Confidence,Margin of Error");
+    csvRows.push(`Wet Bulb Temperature,${predicted_values.T2MWET.toFixed(2)},°C,${confidence.T2MWET},±${data.uncertainty.predicted_values.T2MWET.margin_of_error.toFixed(2)}`);
+    csvRows.push(`Temperature Trend,${predicted_values.T2M_trend.toFixed(2)},°C/day,-,-`);
+    csvRows.push(`Precipitation Likely,${predicted_values.precipitation ? "Yes" : "No"},-,-,-`);
+    csvRows.push(`Liquid Precipitation Probability,${predicted_values.IMERG_PRECLIQUID_PROB.toFixed(2)},%,${confidence.IMERG_PRECLIQUID_PROB},±${data.uncertainty.predicted_values.IMERG_PRECLIQUID_PROB.margin_of_error.toFixed(2)}`);
+    csvRows.push(`Clear Sky Solar Radiation,${predicted_values.CLRSKY_SFC_SW_DWN.toFixed(2)},W/m²,${confidence.CLRSKY_SFC_SW_DWN},±${data.uncertainty.predicted_values.CLRSKY_SFC_SW_DWN.margin_of_error.toFixed(2)}`);
+    csvRows.push("");
+    csvRows.push("");
+
+    // ===== METADATA FOOTER =====
+    csvRows.push("METADATA");
+    csvRows.push("Information,Value");
+    csvRows.push(`Export Generated,${new Date().toLocaleString()}`);
+    csvRows.push(`Selected Parameters,${selected.length} of ${ALL_KEYS.length}`);
+    csvRows.push(`Total Data Points,${Object.values(metadata.data_points_used).reduce((a, b) => a + b, 0)}`);
+
+    // Convert to CSV string
+    const csvContent = csvRows.join("\n");
+
+    // Create a Blob and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    // Generate filename with date and time
+    const now = new Date();
+    const filename = `weather_export_${metadata.location.latitude.toFixed(2)}_${metadata.location.longitude.toFixed(2)}_${now.toISOString().split('T')[0]}.csv`;
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   return (
     <div className="space-y-4">
       {/* Control bar */}
@@ -444,8 +599,16 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
           <span className="text-sm font-medium text-gray-700 dark:text-white/80">Choose cards</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button onClick={selectAll} className="px-3 py-1.5 text-sm rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">Select all</button>
-          <button onClick={selectNone} className="px-3 py-1.5 text-sm rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">Clear</button>
+          <button 
+            onClick={exportToCSV} 
+            className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-xl bg-gray-800 hover:bg-gray-700 text-white dark:bg-white dark:text-gray-800 dark:hover:bg-gray-200 transition-colors"
+            title={`Export ${selected.length} selected parameter(s) to CSV`}
+          >
+            <Download className="size-4" />
+            <span>Export CSV ({selected.length})</span>
+          </button>
+          <button onClick={selectAll} className="px-3 py-1.5 text-sm text-black rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Select all</button>
+          <button onClick={selectNone} className="px-3 py-1.5 text-sm text-black rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">Clear</button>
         </div>
       </div>
 
