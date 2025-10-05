@@ -56,4 +56,23 @@
     });
 </script>
 
+<!-- Script to save coordinates in a variable -->
+<script>
+    let marker;
+    let selectedLatitude = null;
+    let selectedLongitude = null;
+
+    map.on('click', function(e) {
+        const {lat, lng} = e.latlng;
+
+        selectedLatitude = lat;
+        selectedLongitude = lng;
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+    });
+</script>
 </html>

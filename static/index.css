@@ -11,12 +11,12 @@ body {
     color: #000000;
 }
 
-.body-container{
+.body-container {
     height: 100%;
     width: 100%;
 }
 
-.input-container{
+.input-container {
     margin-top: 40%;
     display: flex;
     height: 10%;
@@ -31,14 +31,14 @@ body {
     width: 50%;
 }
 
-.map-container{
+.map-container {
     position: fixed;
     height: 30%;
     width: 40%;
     margin-left: 30%;
 }
 
-.button-container{
+.button-container {
     display: flex;
     margin-top: -10%;
 }
