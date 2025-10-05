@@ -7,6 +7,7 @@
     "very_uncomfortable": 10.9
   },
   "predicted_values": {
+    "T2M_trend": 31.06,
     "T2M": 29.89,
     "T2M_MAX": 36.34,
     "T2M_MIN": 24.19,
@@ -19,7 +20,7 @@
     "CLRSKY_SFC_SW_DWN": 7.84,
     "feeling": "Hot",
     "precipitation": true,
-    "air_quality": 5
+    "air_quality": 7
   },
   "confidence": {
     "T2M": "high",
@@ -116,9 +117,18 @@
       "IMERG_PRECLIQUID_PROB",
       "CLRSKY_SFC_SW_DWN"
     ],
+    "derived_parameters": [
+      "T2M_trend"
+    ],
     "target_date": "07/15",
     "target_month": 7,
     "target_day": 15,
     "tolerance_days": 7
+  },
+  "weather_conditions": {
+    "precipitation_condition": "Light to moderate",
+    "wind_condition": "Calm",
+    "humidity_condition": "Comfortable",
+    "air_quality_label": "Fair"
   }
 }
