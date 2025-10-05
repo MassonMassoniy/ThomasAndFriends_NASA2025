@@ -140,7 +140,9 @@
 
         // Geocoder control
         var geocoder = L.Control.geocoder({
-            defaultMarkGeocode: false
+            defaultMarkGeocode: false,
+            collapsed: false,
+            position: "topright"
         })
         .on('markgeocode', function(e) {
             const latlng = e.geocode.center;
@@ -172,7 +174,7 @@
             document.getElementById("lat").value = e.latlng.lat;
             document.getElementById("lng").value = e.latlng.lng;
 
-            document.getElementById("address").value = `${e.latlng.lat};${e.latlng.lng}`;
+            document.getElementById("address").value = `${e.latlng.lat.toFixed(5)}; ${e.latlng.lng.toFixed(5)}`;
             const { lat, lng } = e.latlng;
 
             // If marker already exists, move it; otherwise create it
