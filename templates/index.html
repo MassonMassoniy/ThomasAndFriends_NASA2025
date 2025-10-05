@@ -153,7 +153,7 @@
 
         // Geocoder control
         var geocoder = L.Control.geocoder({
-            geocoder: new L.Control.Geocoder.Photon(), 
+            geocoder: new L.Control.Geocoder.Photon({geocodingQueryParams: { limit: 5 }}), 
             defaultMarkGeocode: false,
             collapsed: true,
             position: "topright",
