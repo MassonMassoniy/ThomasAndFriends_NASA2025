@@ -17,25 +17,24 @@ body {
 }
 
 .input-container{
-    margin-top: 40%;
     display: flex;
     height: 10%;
     gap: 5%;
-    margin-top: 5%;
+    margin: 0 auto;
 }
 
 /* Input space */
 .input {
     text-align: center;
-    margin: 5% auto auto;
-    width: 50%;
+    margin: 1% auto auto;
+    width: 600px;
 }
 
 .map-container{
-    position: fixed;
-    height: 30%;
+    position: relative;
+    height: 40%;
     width: 40%;
-    margin-left: 30%;
+    margin: 0 auto
 }
 
 .button-container{
@@ -45,22 +44,20 @@ body {
 
 /* date input */
 input[type="date"] {
-    width: 16%;
+    width: 23%;
     height: 24px;
     padding: 1%;
     border-radius: 10px;
     font-size: 140%;
-    margin-top: 32%;
 }
 
 /* Input field */
 input[type="text"] {
-    width: 50%;
+    width: 70%;
     height: 24px;
     padding: 1%;
     border-radius: 10px;
     font-size: 120%;
-    margin-top: 32%;
     background-color: rgb(255, 255, 255);
 }
 
