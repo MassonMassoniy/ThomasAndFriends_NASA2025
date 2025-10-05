@@ -32,6 +32,7 @@ const exampleData = {
     T2M_MIN: 25.12,
     PRECTOTCORR: 1.83,
     WS2M: 3.2,
+    WD2M: -100,
     RH2M: 65.0,
     feeling: "Hot",
     precipitation: true,

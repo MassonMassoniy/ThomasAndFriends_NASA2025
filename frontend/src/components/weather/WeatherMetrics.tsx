@@ -33,6 +33,7 @@ type WeatherData = {
     T2M_MIN: number;
     PRECTOTCORR: number;
     WS2M: number;
+    WD2M?: number;
     RH2M: number;
     feeling: "Hot" | "Cold" | string;
     precipitation: boolean;
@@ -52,6 +53,22 @@ const pct = (n: number) => `${n.toFixed(1)}%`;
 const mm = (n: number) => `${n.toFixed(2)} mm`;
 const ms = (n: number) => `${n.toFixed(1)} m/s`;
 const celsius = (n: number) => `${n.toFixed(1)}°C`;
+
+/** Convert degrees to cardinal direction */
+function degreesToCardinal(degrees: number): string {
+  const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  const index = Math.round(((degrees % 360) / 22.5)) % 16;
+  return directions[index];
+}
+
+/** Get simple cardinal direction (N, E, S, W) */
+function getSimpleCardinal(degrees: number): string {
+  const normalized = ((degrees % 360) + 360) % 360;
+  if (normalized >= 315 || normalized < 45) return 'N';
+  if (normalized >= 45 && normalized < 135) return 'E';
+  if (normalized >= 135 && normalized < 225) return 'S';
+  return 'W';
+}
 
 function confidenceColor(level: "low" | "medium" | "high"): Parameters<typeof Badge>[0]["color"] {
   switch (level) {
@@ -108,6 +125,56 @@ function Progress({ value }: { value: number }) {
         className="h-2 rounded-full bg-gray-800 dark:bg-white/80"
         style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
       />
+    </div>
+  );
+}
+
+/** Wind direction vane component */
+function WindDirectionVane({ degrees }: { degrees: number | undefined }) {
+  // Handle undefined or invalid degrees
+  if (degrees === undefined || degrees === null || isNaN(degrees)) {
+    return (
+      <div className="flex flex-col items-center gap-3">
+        <div className="text-center text-gray-500 dark:text-gray-400">
+          <div className="text-sm">No data available</div>
+        </div>
+      </div>
+    );
+  }
+
+  const cardinal = degreesToCardinal(degrees);
+  const simpleCardinal = getSimpleCardinal(degrees);
+  
+  return (
+      <div className="flex flex-col items-center gap-3">
+        {/* Compass circle with vane */}
+        <div className="relative w-24 h-24 rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
+          {/* Cardinal markers */}
+          <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600 dark:text-gray-400">N</div>
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-600 dark:text-gray-400">S</div>
+          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-600 dark:text-gray-400">W</div>
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-600 dark:text-gray-400">E</div>
+          
+          {/* Wind direction arrow (pointing TO direction) - centered */}
+          <div 
+            className="absolute inset-0 flex items-center justify-center transition-transform duration-500"
+            style={{ transform: `rotate(${degrees}deg)` }}
+          >
+            <div className="relative w-1 h-15">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-red-500 dark:border-b-red-400"></div>
+              <div className="w-full h-full bg-red-500 dark:bg-red-400"></div>
+            </div>
+          </div>
+          
+          {/* Center dot */}
+          <div className="absolute top-1/2 left-1/2 w-3 h-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-400 dark:bg-gray-500 z-10"></div>
+        </div>
+      
+      {/* Direction info */}
+      <div className="text-center">
+        <div className="text-2xl font-bold text-gray-800 dark:text-white">{simpleCardinal}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400">{cardinal} ({degrees.toFixed(0)}°)</div>
+      </div>
     </div>
   );
 }
@@ -189,6 +256,19 @@ export default function WeatherMetrics({ data }: { data: WeatherData }) {
         badge={<Badge variant="light" color={confidenceColor(confidence.WS2M)}>Confidence: {confidence.WS2M}</Badge>}
         icon={<Wind className="size-6 text-gray-800 dark:text-white/90" />}
       />
+
+      {/* Wind Direction Tile - Only show if WD2M data is available */}
+      {predicted_values.WD2M !== undefined && (
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Wind Direction</span>
+            <Badge variant="light" color="info">Live</Badge>
+          </div>
+          <div className="flex items-center justify-center">
+            <WindDirectionVane degrees={predicted_values.WD2M} />
+          </div>
+        </div>
+      )}
 
       <Item
         title="Relative Humidity"
