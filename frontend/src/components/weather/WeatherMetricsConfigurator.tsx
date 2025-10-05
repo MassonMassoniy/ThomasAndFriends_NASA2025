@@ -458,6 +458,16 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
     const { predicted_values, confidence, probabilities, metadata } = data;
     const csvRows: string[] = [];
 
+    // Helper function to check for sentinel/invalid values
+    const isSentinelValue = (value: number): boolean => {
+      return value <= -999 || value === -999 || !isFinite(value) || isNaN(value);
+    };
+
+    // Helper function to format value or return N/A
+    const formatValue = (value: number, decimals: number = 2): string => {
+      return isSentinelValue(value) ? "N/A" : value.toFixed(decimals);
+    };
+
     // ===== HEADER SECTION =====
     csvRows.push("WEATHER DATA EXPORT");
     csvRows.push(`Export Date:,${new Date().toLocaleString()}`);
@@ -467,7 +477,7 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
 
     // ===== PREDICTED VALUES SECTION =====
     const hasPredictedValues = selected.some(k => 
-      ["airTemp", "dailyMax", "dailyMin", "precip", "windSpeed", "windDir", "humidity", "feeling", "airQuality"].includes(k)
+      ["airTemp", "dailyMax", "dailyMin", "precip", "windSpeed", "windDir", "humidity", "feeling", "airQuality", "T2M_trend"].includes(k)
     );
 
     if (hasPredictedValues) {
@@ -475,31 +485,31 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
       csvRows.push("Parameter,Value,Unit,Confidence Level,Margin of Error,Confidence Interval,Data Points");
       
       if (selected.includes("airTemp")) {
-        csvRows.push(`Air Temperature (T2M),${predicted_values.T2M.toFixed(2)},°C,${confidence.T2M},±${data.uncertainty.predicted_values.T2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.T2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.T2M}`);
+        csvRows.push(`Air Temperature (T2M),${formatValue(predicted_values.T2M)},°C,${confidence.T2M},±${formatValue(data.uncertainty.predicted_values.T2M.margin_of_error)},${formatValue(data.uncertainty.predicted_values.T2M.confidence_interval_width)},${metadata.data_points_used.T2M}`);
       }
       
       if (selected.includes("dailyMax")) {
-        csvRows.push(`Daily Max Temperature,${predicted_values.T2M_MAX.toFixed(2)},°C,${confidence.T2M_MAX},±${data.uncertainty.predicted_values.T2M_MAX.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.T2M_MAX.confidence_interval_width.toFixed(2)},${metadata.data_points_used.T2M_MAX}`);
+        csvRows.push(`Daily Max Temperature,${formatValue(predicted_values.T2M_MAX)},°C,${confidence.T2M_MAX},±${formatValue(data.uncertainty.predicted_values.T2M_MAX.margin_of_error)},${formatValue(data.uncertainty.predicted_values.T2M_MAX.confidence_interval_width)},${metadata.data_points_used.T2M_MAX}`);
       }
       
       if (selected.includes("dailyMin")) {
-        csvRows.push(`Daily Min Temperature,${predicted_values.T2M_MIN.toFixed(2)},°C,${confidence.T2M_MIN},±${data.uncertainty.predicted_values.T2M_MIN.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.T2M_MIN.confidence_interval_width.toFixed(2)},${metadata.data_points_used.T2M_MIN}`);
+        csvRows.push(`Daily Min Temperature,${formatValue(predicted_values.T2M_MIN)},°C,${confidence.T2M_MIN},±${formatValue(data.uncertainty.predicted_values.T2M_MIN.margin_of_error)},${formatValue(data.uncertainty.predicted_values.T2M_MIN.confidence_interval_width)},${metadata.data_points_used.T2M_MIN}`);
       }
       
       if (selected.includes("precip")) {
-        csvRows.push(`Precipitation (Total),${predicted_values.PRECTOTCORR.toFixed(2)},mm,${confidence.PRECTOTCORR},±${data.uncertainty.predicted_values.PRECTOTCORR.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.PRECTOTCORR.confidence_interval_width.toFixed(2)},${metadata.data_points_used.PRECTOTCORR}`);
+        csvRows.push(`Precipitation (Total),${formatValue(predicted_values.PRECTOTCORR)},mm,${confidence.PRECTOTCORR},±${formatValue(data.uncertainty.predicted_values.PRECTOTCORR.margin_of_error)},${formatValue(data.uncertainty.predicted_values.PRECTOTCORR.confidence_interval_width)},${metadata.data_points_used.PRECTOTCORR}`);
       }
       
       if (selected.includes("windSpeed")) {
-        csvRows.push(`Wind Speed,${predicted_values.WS2M.toFixed(2)},m/s,${confidence.WS2M},±${data.uncertainty.predicted_values.WS2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.WS2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.WS2M}`);
+        csvRows.push(`Wind Speed,${formatValue(predicted_values.WS2M)},m/s,${confidence.WS2M},±${formatValue(data.uncertainty.predicted_values.WS2M.margin_of_error)},${formatValue(data.uncertainty.predicted_values.WS2M.confidence_interval_width)},${metadata.data_points_used.WS2M}`);
       }
       
       if (selected.includes("windDir")) {
-        csvRows.push(`Wind Direction,${predicted_values.WD2M.toFixed(0)},degrees,${confidence.WD2M},±${data.uncertainty.predicted_values.WD2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.WD2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.WD2M}`);
+        csvRows.push(`Wind Direction,${formatValue(predicted_values.WD2M, 0)},degrees,${confidence.WD2M},±${formatValue(data.uncertainty.predicted_values.WD2M.margin_of_error)},${formatValue(data.uncertainty.predicted_values.WD2M.confidence_interval_width)},${metadata.data_points_used.WD2M}`);
       }
       
       if (selected.includes("humidity")) {
-        csvRows.push(`Relative Humidity,${predicted_values.RH2M.toFixed(1)},%,${confidence.RH2M},±${data.uncertainty.predicted_values.RH2M.margin_of_error.toFixed(2)},${data.uncertainty.predicted_values.RH2M.confidence_interval_width.toFixed(2)},${metadata.data_points_used.RH2M}`);
+        csvRows.push(`Relative Humidity,${formatValue(predicted_values.RH2M, 1)},%,${confidence.RH2M},±${formatValue(data.uncertainty.predicted_values.RH2M.margin_of_error)},${formatValue(data.uncertainty.predicted_values.RH2M.confidence_interval_width)},${metadata.data_points_used.RH2M}`);
       }
       
       if (selected.includes("feeling")) {
@@ -508,6 +518,10 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
       
       if (selected.includes("airQuality")) {
         csvRows.push(`Air Quality Index,${predicted_values.air_quality},/10,-,-,-,-`);
+      }
+
+      if (selected.includes("T2M_trend")) {
+        csvRows.push(`Temperature Trend,${formatValue(predicted_values.T2M_trend)},°C/day,-,-,-,-`);
       }
       
       csvRows.push("");
@@ -551,17 +565,6 @@ export default function WeatherMetricsConfigurator({ data, defaultVisible }: { d
       csvRows.push("");
       csvRows.push("");
     }
-
-    // ===== ADDITIONAL PARAMETERS SECTION =====
-    csvRows.push("ADDITIONAL PARAMETERS");
-    csvRows.push("Parameter,Value,Unit,Confidence,Margin of Error");
-    csvRows.push(`Wet Bulb Temperature,${predicted_values.T2MWET.toFixed(2)},°C,${confidence.T2MWET},±${data.uncertainty.predicted_values.T2MWET.margin_of_error.toFixed(2)}`);
-    csvRows.push(`Temperature Trend,${predicted_values.T2M_trend.toFixed(2)},°C/day,-,-`);
-    csvRows.push(`Precipitation Likely,${predicted_values.precipitation ? "Yes" : "No"},-,-,-`);
-    csvRows.push(`Liquid Precipitation Probability,${predicted_values.IMERG_PRECLIQUID_PROB.toFixed(2)},%,${confidence.IMERG_PRECLIQUID_PROB},±${data.uncertainty.predicted_values.IMERG_PRECLIQUID_PROB.margin_of_error.toFixed(2)}`);
-    csvRows.push(`Clear Sky Solar Radiation,${predicted_values.CLRSKY_SFC_SW_DWN.toFixed(2)},W/m²,${confidence.CLRSKY_SFC_SW_DWN},±${data.uncertainty.predicted_values.CLRSKY_SFC_SW_DWN.margin_of_error.toFixed(2)}`);
-    csvRows.push("");
-    csvRows.push("");
 
     // ===== METADATA FOOTER =====
     csvRows.push("METADATA");
