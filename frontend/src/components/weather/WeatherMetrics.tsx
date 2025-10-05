@@ -146,6 +146,78 @@ export default function WeatherMetrics({ data }: { data: WeatherData }) {
 
   return (
     <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
+
+      {/* -------- Predicted Values -------- */}
+      <div className="col-span-full mt-3">
+        <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Predicted Values</h3>
+      </div>
+
+      <Item
+        title="Air Temp"
+        value={celsius(predicted_values.T2M)}
+        sub="Current-day mean"
+        badge={<Badge variant="light" color={confidenceColor(confidence.T2M)}>Confidence: {confidence.T2M}</Badge>}
+        icon={<ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      <Item
+        title="Daily Max"
+        value={celsius(predicted_values.T2M_MAX)}
+        badge={<Badge variant="light" color={confidenceColor(confidence.T2M_MAX)}>Confidence: {confidence.T2M_MAX}</Badge>}
+        icon={<Sun className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      <Item
+        title="Daily Min"
+        value={celsius(predicted_values.T2M_MIN)}
+        badge={<Badge variant="light" color="info">Nighttime Low</Badge>}
+        icon={<Cloud className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      <Item
+        title="Precipitation"
+        value={mm(predicted_values.PRECTOTCORR)}
+        sub={predicted_values.PRECTOTCORR >= 10 ? "Heavy rain risk" : predicted_values.PRECTOTCORR >= 1 ? "Light to moderate" : "Minimal"}
+        badge={<Badge variant="light" color={confidenceColor(confidence.PRECTOTCORR)}>Confidence: {confidence.PRECTOTCORR}</Badge>}
+        icon={<CloudSunRain className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      <Item
+        title="Wind Speed"
+        value={ms(predicted_values.WS2M)}
+        sub={predicted_values.WS2M >= 10 ? "Strong" : predicted_values.WS2M >= 5 ? "Breezy" : "Calm"}
+        badge={<Badge variant="light" color={confidenceColor(confidence.WS2M)}>Confidence: {confidence.WS2M}</Badge>}
+        icon={<Wind className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      <Item
+        title="Relative Humidity"
+        value={`${predicted_values.RH2M.toFixed(0)}%`}
+        sub={predicted_values.RH2M >= 80 ? "Muggy" : predicted_values.RH2M <= 30 ? "Dry" : "Comfortable"}
+        badge={<Badge variant="light" color={confidenceColor(confidence.RH2M)}>Confidence: {confidence.RH2M}</Badge>}
+        icon={<Droplets className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      <Item
+        title="Feeling"
+        value={predicted_values.feeling}
+        icon={<Gauge className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
+      {/* <Item
+        title="Precipitation"
+        value={predicted_values.precipitation ? "Yes" : "No"}
+        badge={precipitationBadge(predicted_values.precipitation)}
+        icon={<CloudRain className="size-6 text-gray-800 dark:text-white/90" />}
+      /> */}
+
+      <Item
+        title="Air Quality"
+        value={`AQI ${predicted_values.air_quality}/10`}
+        badge={airQualityBadge(predicted_values.air_quality)}
+        icon={<Activity className="size-6 text-gray-800 dark:text-white/90" />}
+      />
+
       {/* -------- Probabilities -------- */}
       <div className="col-span-full">
         <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Probabilities</h3>
@@ -233,76 +305,6 @@ export default function WeatherMetrics({ data }: { data: WeatherData }) {
         </div>
       </div>
 
-      {/* -------- Predicted Values -------- */}
-      <div className="col-span-full mt-3">
-        <h3 className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Predicted Values</h3>
-      </div>
-
-      <Item
-        title="Air Temp"
-        value={celsius(predicted_values.T2M)}
-        sub="Current-day mean"
-        badge={<Badge variant="light" color={confidenceColor(confidence.T2M)}>Confidence: {confidence.T2M}</Badge>}
-        icon={<ThermometerSun className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      <Item
-        title="Daily Max"
-        value={celsius(predicted_values.T2M_MAX)}
-        badge={<Badge variant="light" color={confidenceColor(confidence.T2M_MAX)}>Confidence: {confidence.T2M_MAX}</Badge>}
-        icon={<Sun className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      <Item
-        title="Daily Min"
-        value={celsius(predicted_values.T2M_MIN)}
-        badge={<Badge variant="light" color="info">Nighttime Low</Badge>}
-        icon={<Cloud className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      <Item
-        title="Precipitation"
-        value={mm(predicted_values.PRECTOTCORR)}
-        sub={predicted_values.PRECTOTCORR >= 10 ? "Heavy rain risk" : predicted_values.PRECTOTCORR >= 1 ? "Light to moderate" : "Minimal"}
-        badge={<Badge variant="light" color={confidenceColor(confidence.PRECTOTCORR)}>Confidence: {confidence.PRECTOTCORR}</Badge>}
-        icon={<CloudSunRain className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      <Item
-        title="Wind Speed"
-        value={ms(predicted_values.WS2M)}
-        sub={predicted_values.WS2M >= 10 ? "Strong" : predicted_values.WS2M >= 5 ? "Breezy" : "Calm"}
-        badge={<Badge variant="light" color={confidenceColor(confidence.WS2M)}>Confidence: {confidence.WS2M}</Badge>}
-        icon={<Wind className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      <Item
-        title="Relative Humidity"
-        value={`${predicted_values.RH2M.toFixed(0)}%`}
-        sub={predicted_values.RH2M >= 80 ? "Muggy" : predicted_values.RH2M <= 30 ? "Dry" : "Comfortable"}
-        badge={<Badge variant="light" color={confidenceColor(confidence.RH2M)}>Confidence: {confidence.RH2M}</Badge>}
-        icon={<Droplets className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      <Item
-        title="Feeling"
-        value={predicted_values.feeling}
-        icon={<Gauge className="size-6 text-gray-800 dark:text-white/90" />}
-      />
-
-      {/* <Item
-        title="Precipitation"
-        value={predicted_values.precipitation ? "Yes" : "No"}
-        badge={precipitationBadge(predicted_values.precipitation)}
-        icon={<CloudRain className="size-6 text-gray-800 dark:text-white/90" />}
-      /> */}
-
-      <Item
-        title="Air Quality"
-        value={`AQI ${predicted_values.air_quality}/10`}
-        badge={airQualityBadge(predicted_values.air_quality)}
-        icon={<Activity className="size-6 text-gray-800 dark:text-white/90" />}
-      />
     </div>
   );
 }
