@@ -1,6 +1,99 @@
 <!DOCTYPE html>
 <html>
 
+<style>
+body {
+    background-size: cover;
+    background-color: #f9fafb;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Top text */
+.heading {
+    text-align: center;
+    font-size: 300%;
+    color: #000000;
+}
+
+.body-container {
+    height: 100%;
+    width: 100%;
+}
+
+.input-container{
+    display: flex;
+    height: 10%;
+    gap: 5%;
+    margin: 0 auto;
+}
+
+/* Input space */
+.input {
+    text-align: center;
+    margin: 1% auto auto;
+    width: 600px;
+}
+
+.map-container{
+    position: relative;
+    height: 40%;
+    width: 40%;
+    border-style: solid;
+    border-radius: 20px;
+    border-width: 3px;
+    border-color: #000000;
+    margin: 0 auto
+}
+
+/* #map{
+    border: 2px solid #000000;
+} */
+
+.button-container {
+    display: flex;
+    margin-top: -10%;
+}
+
+/* date input */
+input[type="date"] {
+    width: 23%;
+    height: 24px;
+    padding: 1%;
+    border-radius: 10px;
+    font-size: 140%;
+}
+
+/* Input field */
+input[type="text"] {
+    width: 70%;
+    height: 24px;
+    padding: 1%;
+    border-radius: 10px;
+    font-size: 120%;
+    background-color: rgb(255, 255, 255);
+}
+
+/* Button parameters */
+button {
+    display: inline-block;
+    width: 28%;
+    height: 7%;
+    padding: 14px 28px;
+    font-size: 24px;
+    border-radius: 10px;
+    background-color: #6283ff;
+    color: #000000;
+    border: none;
+    cursor: pointer;
+    margin-top: 20%;
+    margin-left: 36%;
+}
+
+button:hover {
+    background-color: #496ceb;
+}
+</style>
+
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
