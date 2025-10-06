@@ -1,5 +1,5 @@
 # Will It Rain On My Parade? - Web App
-## [WEBSITE](https://drmy-server-fast.tail8afd19.ts.net/)
+## [WEBSITE](https://drmy-server-fast.tail8afd19.ts.net/api)
 
 ## [Canva Presentation](https://www.canva.com/design/DAG07649bCo/uYBFvDCEiXo7r2IP67uzpQ/edit?utm_content=DAG07649bCo&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
